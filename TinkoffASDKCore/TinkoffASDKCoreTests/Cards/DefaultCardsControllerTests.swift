@@ -81,4 +81,116 @@ final class DefaultCardsControllerTests: XCTestCase {
         
         XCTAssertEqual(mockCardsLoader.loadCardsTimesCalled, 2)
     }
+    
+    func testCardsControllerNotifyAddedListenerIfLoadingInProgressForSameCustomerKey() {
+        let cardsController = DefaultCardsController(cardsLoader: mockCardsLoader)
+        cardsController.loadCards(customerKey: "customerKey1") { _ in }
+        
+        let listener1 = MockCardsControllerListener()
+        listener1.customerKey = "customerKey1"
+        cardsController.addListener(listener1)
+        
+        XCTAssertTrue(listener1.cardsControllerDidStartLoadCardsWasCalled)
+    }
+    
+    func testCardsControllerNotNotifyAddedListenerIfLoadingFinishedForSameCustomerKey() {
+        let expectation = XCTestExpectation()
+        
+        mockCardsLoader.result = .success([])
+        
+        let cardsController = DefaultCardsController(cardsLoader: mockCardsLoader)
+        cardsController.loadCards(customerKey: "customerKey1") { _ in
+            let listener1 = MockCardsControllerListener()
+            listener1.customerKey = "customerKey1"
+            cardsController.addListener(listener1)
+            XCTAssertFalse(listener1.cardsControllerDidStartLoadCardsWasCalled)
+            
+            expectation.fulfill()
+        }
+        
+        wait(for: [expectation], timeout: 5)
+    }
+    
+    func testCardsControllerSetCardsToAddedListenerIfHasSavedCardsForCustomerKey() {
+        let cardsController = DefaultCardsController(cardsLoader: mockCardsLoader)
+        
+        let listener1 = MockCardsControllerListener()
+        listener1.customerKey = "customerKey1"
+        cardsController.addListener(listener1)
+        
+        mockCardsLoader.result = .success([.init(pan: "CardPan",
+                                                 cardId: "CardId",
+                                                 status: .active,
+                                                 parentPaymentId: nil,
+                                                 expDate: nil)])
+        
+        let expectation = XCTestExpectation()
+        cardsController.loadCards(customerKey: "customerKey1") { _ in
+            
+            let listener2 = MockCardsControllerListener()
+            listener2.customerKey = "customerKey1"
+            cardsController.addListener(listener2)
+            
+            XCTAssertEqual(try! listener2.result!.get(), try! self.mockCardsLoader.result!.get())
+
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 5)
+    }
+    
+    func testCardsControllerDoesntSetCardsToAddedListenerIfHasSavedCardsOnlyForOtherCustomerKey() {
+        let cardsController = DefaultCardsController(cardsLoader: mockCardsLoader)
+        
+        let listener1 = MockCardsControllerListener()
+        listener1.customerKey = "customerKey1"
+        cardsController.addListener(listener1)
+        
+        mockCardsLoader.result = .success([.init(pan: "CardPan",
+                                                 cardId: "CardId",
+                                                 status: .active,
+                                                 parentPaymentId: nil,
+                                                 expDate: nil)])
+        
+        let expectation = XCTestExpectation()
+        cardsController.loadCards(customerKey: "customerKey1") { _ in
+            
+            let listener2 = MockCardsControllerListener()
+            listener2.customerKey = "customerKey2"
+            cardsController.addListener(listener2)
+            
+            XCTAssertNil(listener2.result)
+
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 5)
+    }
+    
+    func testCardsControllerRemoveCardCacheIfLastListenerForCustomerKeyRemoved() {
+        let cardsController = DefaultCardsController(cardsLoader: mockCardsLoader)
+        
+        let listener1 = MockCardsControllerListener()
+        listener1.customerKey = "customerKey1"
+        cardsController.addListener(listener1)
+        
+        mockCardsLoader.result = .success([.init(pan: "CardPan",
+                                                 cardId: "CardId",
+                                                 status: .active,
+                                                 parentPaymentId: nil,
+                                                 expDate: nil)])
+        
+        let expectation = XCTestExpectation()
+        cardsController.loadCards(customerKey: "customerKey1") { _ in
+            
+            cardsController.removeListener(listener1)
+            
+            let listener2 = MockCardsControllerListener()
+            listener2.customerKey = "customerKey1"
+            cardsController.addListener(listener2)
+            
+            XCTAssertNil(listener2.result)
+            
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 5)
+    }
 }

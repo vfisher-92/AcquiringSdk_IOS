@@ -27,6 +27,7 @@ final class DefaultCardsController: UpdatableCardsController {
     private var listeners = [WeakCardsControllerListener]()
     private var state = [String: Bool]()
     private var completions = [String: [(Result<[PaymentCard], Error>) -> Void]]()
+    private var cards = [String: [PaymentCard]]()
     
     init(cardsLoader: CardsLoader) {
         self.cardsLoader = cardsLoader
@@ -36,6 +37,7 @@ final class DefaultCardsController: UpdatableCardsController {
                    completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
         var customerKeyCompletions = completions[customerKey] ?? [(Result<[PaymentCard], Error>) -> Void]()
         customerKeyCompletions.append(completion)
+        completions[customerKey] = customerKeyCompletions
         
         notifyListenersAboutLoadingStart(with: customerKey)
         
@@ -47,11 +49,24 @@ final class DefaultCardsController: UpdatableCardsController {
         cardsLoader.loadCards(customerKey: customerKey) { [weak self] result in
             guard let self = self else { return }
             DispatchQueue.main.async {
+                if case let .success(cards) = result {
+                    self.cards[customerKey] = cards
+                }
                 self.state[customerKey] = false
                 self.callAndResetCompletions(with: customerKey, result: result)
                 self.notifyListenersAboutLoadingFinish(with: customerKey, result: result)
             }
         }
+    }
+    
+    func removeListener(_ listener: CardsControllerListener) {
+        let customerKeyListeners = listeners
+            .filter { $0.value?.customerKey == listener.customerKey && $0.value !== listener }
+        if customerKeyListeners.isEmpty {
+            cards[listener.customerKey] = nil
+        }
+        
+        self.listeners = self.listeners.filter { $0.value !== listener }
     }
     
     func addListener(_ listener: CardsControllerListener) {
@@ -62,6 +77,8 @@ final class DefaultCardsController: UpdatableCardsController {
         let state = self.state[listener.customerKey] ?? false
         if state {
             listener.cardsControllerDidStartLoadCards(self)
+        } else if let savedCards = cards[listener.customerKey] {
+            listener.cardsControllerDidStopLoadCards(self, result: .success(savedCards))
         }
     }
 }
