@@ -92,32 +92,6 @@ final class DefaultCardsControllerTests: XCTestCase {
         wait(for: [expectation], timeout: 5)
     }
 
-    func testCardsControllerSetCardsToAddedListenerIfHasSavedCards() {
-        let cardsController = DefaultCardsController(customerKey: "customerKey1", cardsLoader: mockCardsLoader)
-
-        let listener1 = MockCardsControllerListener()
-        cardsController.addListener(listener1)
-
-        mockCardsLoader.result = .success([.init(pan: "CardPan",
-                                                 cardId: "CardId",
-                                                 status: .active,
-                                                 parentPaymentId: nil,
-                                                 expDate: nil)])
-
-        let expectation = XCTestExpectation()
-        cardsController.loadCards() { _ in
-
-            let listener2 = MockCardsControllerListener()
-            cardsController.addListener(listener2)
-
-            XCTAssertEqual(try! listener2.result!.get(), try! self.mockCardsLoader.result.get())
-
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 5)
-    }
-
-
     func testCardsControllerCallsAllCompletionsIfExplicitCallLoadCardsTwoTimes() {
         let cardsController = DefaultCardsController(customerKey: "customerKey1", cardsLoader: mockCardsLoader)
 
