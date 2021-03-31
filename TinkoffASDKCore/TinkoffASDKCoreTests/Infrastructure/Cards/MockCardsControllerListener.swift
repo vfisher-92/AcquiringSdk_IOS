@@ -31,8 +31,7 @@ final class MockCardsControllerListener: CardsControllerListener {
         cardsControllerDidStartLoadCardsWasCalled = true
     }
     
-    func cardsControllerDidStopLoadCards(_ cardsController: CardsController, result: Result<[PaymentCard], Error>) {
+    func cardsControllerDidStopLoadCards(_ cardsController: CardsController) {
         cardsControllerDidStopLoadCardsWasCalled = true
-        self.result = result
     }
 }

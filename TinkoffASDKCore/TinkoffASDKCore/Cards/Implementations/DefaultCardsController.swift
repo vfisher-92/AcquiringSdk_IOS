@@ -33,7 +33,7 @@ final class DefaultCardsController: UpdatableCardsController {
     
     private var isLoading = false
     private var completions = [(Result<[PaymentCard], Error>) -> Void]()
-    private var cachedCards = [PaymentCard]()
+    private(set) var cards = [PaymentCard]()
     
     init(customerKey: String,
          cardsLoader: CardsLoader) {
@@ -52,7 +52,7 @@ final class DefaultCardsController: UpdatableCardsController {
             guard let self = self else { return }
             DispatchQueue.main.async {
                 if case let .success(cards) = result {
-                    self.cachedCards = cards
+                    self.cards = cards
                 }
                 
                 self.isLoading = false
@@ -74,8 +74,8 @@ final class DefaultCardsController: UpdatableCardsController {
         
         if isLoading {
             listener.cardsControllerDidStartLoadCards(self)
-        } else if !cachedCards.isEmpty {
-            listener.cardsControllerDidStopLoadCards(self, result: .success(cachedCards))
+        } else if !cards.isEmpty {
+            listener.cardsControllerDidStopLoadCards(self)
         }
     }
 }
@@ -91,7 +91,23 @@ private extension DefaultCardsController {
     }
     
     func notifyListenersAboutLoadingFinish(result: Result<[PaymentCard], Error>) {
-        listeners.forEach { $0.value?.cardsControllerDidStopLoadCards(self, result: result) }
+        listeners.forEach { $0.value?.cardsControllerDidStopLoadCards(self) }
+    }
+}
+
+extension DefaultCardsController: CardsProviderDelegate {
+    func cardsProviderDeinit(_ cardsProvider: CardsProvider) {
+        removeListener(cardsProvider)
+    }
+    
+    func cardsProviderNeedToLoadCards(_ cardsProvider: CardsProvider, completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
+        loadCards(completion: completion)
+    }
+}
+
+extension DefaultCardsController: CardsProviderDataSource {
+    func cardsProviderCards(_ cardsProvider: CardsProvider) -> [PaymentCard] {
+        return cards
     }
 }
 

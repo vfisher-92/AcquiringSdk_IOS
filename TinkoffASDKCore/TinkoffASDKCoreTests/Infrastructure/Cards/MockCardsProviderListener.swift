@@ -1,6 +1,6 @@
 //
 //
-//  CardsController.swift
+//  MockCardsProviderListener.swift
 //
 //  Copyright (c) 2021 Tinkoff Bank
 //
@@ -18,21 +18,13 @@
 //
 
 
-import Foundation
+@testable import TinkoffASDKCore
 
-protocol CardsControllerListener: AnyObject {
-    var customerKey: String { get }
+final class MockCardsProviderListener: CardsProviderListener {
     
-    func cardsControllerDidStartLoadCards(_ cardsController: CardsController)
-    func cardsControllerDidStopLoadCards(_ cardsController: CardsController)
-}
-
-protocol CardsController {
-    var cards: [PaymentCard] { get }
-    func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void)
-}
-
-protocol UpdatableCardsController: CardsController {
-    func addListener(_ listener: CardsControllerListener)
-    func removeListener(_ listener: CardsControllerListener)
+    private(set) var states = [CardsProviderState]()
+    
+    func cardsProvider(_ cardsProvider: CardsProvider, didUpdateState state: CardsProviderState) {
+        states.append(state)
+    }
 }
