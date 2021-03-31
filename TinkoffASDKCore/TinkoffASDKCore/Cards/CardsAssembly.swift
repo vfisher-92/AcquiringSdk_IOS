@@ -34,31 +34,32 @@ final class CardsAssembly {
     }
     
     func buildCardsProvider(customerKey: String,
+                            predicates: [CardsProviderPredicate],
                             synchronized: Bool) -> CardsProvider {
         if synchronized {
-            return buildSynchronizedCardsProvider(customerKey: customerKey)
+            return buildSynchronizedCardsProvider(customerKey: customerKey, predicates: predicates)
         } else {
-            return buildNotSynchronizedCardsProvider(customerKey: customerKey)
+            return buildNotSynchronizedCardsProvider(customerKey: customerKey, predicates: predicates)
         }
     }
 }
 
 private extension CardsAssembly {
 
-    func buildSynchronizedCardsProvider(customerKey: String) -> CardsProvider {
+    func buildSynchronizedCardsProvider(customerKey: String, predicates: [CardsProviderPredicate] = []) -> CardsProvider {
         let controller = cardsControllers[customerKey] ?? DefaultCardsController(customerKey: customerKey, cardsLoader: cardsLoader)
         cardsControllers[customerKey] = controller
         
-        let provider = DefaultCardsProvider(customerKey: customerKey, cardsController: controller)
+        let provider = DefaultCardsProvider(customerKey: customerKey, cardsController: controller, predicates: predicates)
         controller.addListener(provider)
         
         return provider
     }
     
-    func buildNotSynchronizedCardsProvider(customerKey: String) -> CardsProvider {
+    func buildNotSynchronizedCardsProvider(customerKey: String, predicates: [CardsProviderPredicate] = []) -> CardsProvider {
         let controller = DefaultCardsController(customerKey: customerKey, cardsLoader: cardsLoader)
         
-        let provider = DefaultCardsProvider(customerKey: customerKey, cardsController: controller)
+        let provider = DefaultCardsProvider(customerKey: customerKey, cardsController: controller, predicates: predicates)
         controller.addListener(provider)
                             
         return provider

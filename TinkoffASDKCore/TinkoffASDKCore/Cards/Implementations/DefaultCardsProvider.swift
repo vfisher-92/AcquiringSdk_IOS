@@ -23,16 +23,25 @@ import Foundation
 final class DefaultCardsProvider: CardsProvider {
     let customerKey: String
     var cards: [PaymentCard] {
-        cardsController.cards
+        cardsController.cards.filter { card in
+            var result = true
+            for predicate in predicates {
+                result = result && predicate.predicateClosure(card)
+            }
+            return result
+        }
     }
     private let cardsController: CardsController
+    private let predicates: [CardsProviderPredicate]
     
     weak var listener: CardsProviderListener?
 
     init(customerKey: String,
-         cardsController: CardsController) {
+         cardsController: CardsController,
+         predicates: [CardsProviderPredicate] = []) {
         self.customerKey = customerKey
         self.cardsController = cardsController
+        self.predicates = predicates
     }
     
     deinit {

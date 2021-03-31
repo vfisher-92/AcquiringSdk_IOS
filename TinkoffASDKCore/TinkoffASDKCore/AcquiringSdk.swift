@@ -269,7 +269,10 @@ public final class AcquiringSdk: NSObject {
     }
     
     public func cardsProvider(customerKey: String,
+                              predicates: CardsProviderPredicate...,
                               synchronized: Bool) -> CardsProvider {
-        return cardsAssembly.buildCardsProvider(customerKey: customerKey, synchronized: synchronized)
+        return cardsAssembly.buildCardsProvider(customerKey: customerKey,
+                                                predicates: predicates,
+                                                synchronized: synchronized)
     }
 }

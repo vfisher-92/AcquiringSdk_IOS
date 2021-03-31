@@ -141,4 +141,71 @@ class CardsIntegrationTests: XCTestCase {
         cardsProvider2 = nil
         XCTAssertNil(weakCardsController)
     }
+    
+    func testPredicateForActiveCards() {
+        let cardsController = self.cardsController
+        
+        let cardsProvider1 = DefaultCardsProvider(customerKey: customerKey,
+                                                  cardsController: cardsController,
+                                                  predicates: [.activeCards])
+        cardsController.addListener(cardsProvider1)
+        
+        let expectedCards: [PaymentCard] = [.init(pan: "11111",
+                                                  cardId: "9999",
+                                                  status: .active,
+                                                  parentPaymentId: nil,
+                                                  expDate: nil),
+                                            .init(pan: "22222",
+                                                  cardId: "6666",
+                                                  status: .inactive,
+                                                  parentPaymentId: nil,
+                                                  expDate: nil)]
+        mockCardsLoader.result = .success(expectedCards)
+        mockCardsLoader.timeout = 0.1
+        
+        let expectation = XCTestExpectation()
+        
+        cardsProvider1.loadCards { result in
+            XCTAssertEqual(cardsProvider1.cards.count, 1)
+            expectation.fulfill()
+        }
+        
+        wait(for: [expectation], timeout: 5.0)
+    }
+    
+    func testPredicateForActiveCardsAndWithParentPayment() {
+        let cardsController = self.cardsController
+        
+        let cardsProvider1 = DefaultCardsProvider(customerKey: customerKey,
+                                                  cardsController: cardsController,
+                                                  predicates: [.activeCards, .parentPaymentCards])
+        cardsController.addListener(cardsProvider1)
+        
+        let expectedCards: [PaymentCard] = [.init(pan: "11111",
+                                                  cardId: "9999",
+                                                  status: .active,
+                                                  parentPaymentId: nil,
+                                                  expDate: nil),
+                                            .init(pan: "22222",
+                                                  cardId: "6666",
+                                                  status: .inactive,
+                                                  parentPaymentId: nil,
+                                                  expDate: nil),
+                                            .init(pan: "22222",
+                                                  cardId: "6666",
+                                                  status: .active,
+                                                  parentPaymentId: "0323232",
+                                                  expDate: nil)]
+        mockCardsLoader.result = .success(expectedCards)
+        mockCardsLoader.timeout = 0.1
+        
+        let expectation = XCTestExpectation()
+        
+        cardsProvider1.loadCards { result in
+            XCTAssertEqual(cardsProvider1.cards.count, 1)
+            expectation.fulfill()
+        }
+        
+        wait(for: [expectation], timeout: 5.0)
+    }
 }
