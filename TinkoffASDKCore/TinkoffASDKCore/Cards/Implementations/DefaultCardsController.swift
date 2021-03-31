@@ -34,11 +34,16 @@ final class DefaultCardsController: UpdatableCardsController {
     private var isLoading = false
     private var completions = [(Result<[PaymentCard], Error>) -> Void]()
     private(set) var cards = [PaymentCard]()
+    private var request: Cancellable?
     
     init(customerKey: String,
          cardsLoader: CardsLoader) {
         self.customerKey = customerKey
         self.cardsLoader = cardsLoader
+    }
+    
+    deinit {
+        request?.cancel()
     }
     
     func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
@@ -48,13 +53,14 @@ final class DefaultCardsController: UpdatableCardsController {
         guard !isLoading else { return }
         isLoading = true
         
-        cardsLoader.loadCards(customerKey: customerKey) { [weak self] result in
+        request = cardsLoader.loadCards(customerKey: customerKey) { [weak self] result in
             guard let self = self else { return }
             DispatchQueue.main.async {
                 if case let .success(cards) = result {
                     self.cards = cards
                 }
                 
+                self.request = nil
                 self.isLoading = false
                 self.notifyListenersAboutLoadingFinish(result: result)
                 self.callAndResetCompletions(result: result)

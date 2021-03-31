@@ -1,6 +1,6 @@
 //
 //
-//  CardsLoader.swift
+//  DefaultCardsLoader.swift
 //
 //  Copyright (c) 2021 Tinkoff Bank
 //
@@ -20,6 +20,22 @@
 
 import Foundation
 
-protocol CardsLoader {
-    func loadCards(customerKey: String, completion: @escaping (Result<[PaymentCard], Error>) -> Void) -> Cancellable
+final class DefaultCardsLoader: CardsLoader {
+    
+    // Dependencies
+    
+    private let api: API
+    
+    // MARK: - Init
+    
+    init(api: API) {
+        self.api = api
+    }
+    
+    // MARK: - CardsLoader
+    
+    func loadCards(customerKey: String, completion: @escaping (Result<[PaymentCard], Error>) -> Void) -> Cancellable {
+        let request = GetCardListRequest(getCardListData: .init(customerKey: customerKey))
+        return api.performRequest(request, completion: completion)
+    }
 }
