@@ -23,7 +23,7 @@ import Foundation
 
 final class MockCardsLoader: CardsLoader {
     
-    var result: Result<[PaymentCard], Error>?
+    var result: Result<[PaymentCard], Error> = .success([])
     var timeout: TimeInterval = 1.5
     
     var loadCardsTimesCalled = 0
@@ -31,9 +31,7 @@ final class MockCardsLoader: CardsLoader {
     func loadCards(customerKey: String, completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
         loadCardsTimesCalled += 1
         DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
-            if let result = self.result {
-                completion(result)
-            }
+            completion(self.result)
         }
     }
 }

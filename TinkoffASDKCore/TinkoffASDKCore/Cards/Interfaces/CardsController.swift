@@ -29,8 +29,7 @@ protocol CardsControllerListener: AnyObject {
 }
 
 protocol CardsController {
-    func loadCards(customerKey: String,
-                   completion: @escaping (Result<[PaymentCard], Error>) -> Void)
+    func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void)
     func removeListener(_ listener: CardsControllerListener)
 }
 

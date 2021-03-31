@@ -22,81 +22,76 @@ import Foundation
 
 final class DefaultCardsController: UpdatableCardsController {
     
+    private let customerKey: String
     private let cardsLoader: CardsLoader
     
-    private var listeners = [WeakCardsControllerListener]()
-    private var state = [String: Bool]()
-    private var completions = [String: [(Result<[PaymentCard], Error>) -> Void]]()
-    private var cards = [String: [PaymentCard]]()
+    // Listeners
     
-    init(cardsLoader: CardsLoader) {
+    private var listeners = [WeakCardsControllerListener]()
+    
+    // State
+    
+    private var isLoading = false
+    private var completions = [(Result<[PaymentCard], Error>) -> Void]()
+    private var cachedCards = [PaymentCard]()
+    
+    init(customerKey: String,
+         cardsLoader: CardsLoader) {
+        self.customerKey = customerKey
         self.cardsLoader = cardsLoader
     }
     
-    func loadCards(customerKey: String,
-                   completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
-        var customerKeyCompletions = completions[customerKey] ?? [(Result<[PaymentCard], Error>) -> Void]()
-        customerKeyCompletions.append(completion)
-        completions[customerKey] = customerKeyCompletions
+    func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
+        completions.append(completion)
+        notifyListenersAboutLoadingStart()
         
-        notifyListenersAboutLoadingStart(with: customerKey)
-        
-        let customerKeyState = state[customerKey] ?? false
-        guard !customerKeyState else { return }
-        
-        state[customerKey] = true
+        guard !isLoading else { return }
+        isLoading = true
         
         cardsLoader.loadCards(customerKey: customerKey) { [weak self] result in
             guard let self = self else { return }
             DispatchQueue.main.async {
                 if case let .success(cards) = result {
-                    self.cards[customerKey] = cards
+                    self.cachedCards = cards
                 }
-                self.state[customerKey] = false
-                self.callAndResetCompletions(with: customerKey, result: result)
-                self.notifyListenersAboutLoadingFinish(with: customerKey, result: result)
+                
+                self.isLoading = false
+                self.callAndResetCompletions(result: result)
+                self.notifyListenersAboutLoadingFinish(result: result)
             }
         }
     }
     
     func removeListener(_ listener: CardsControllerListener) {
-        let customerKeyListeners = listeners
-            .filter { $0.value?.customerKey == listener.customerKey && $0.value !== listener }
-        if customerKeyListeners.isEmpty {
-            cards[listener.customerKey] = nil
-        }
-        
-        self.listeners = self.listeners.filter { $0.value !== listener }
+        let listeners = self.listeners.filter { $0.value !== listener }
+        self.listeners = listeners
     }
-    
+
     func addListener(_ listener: CardsControllerListener) {
         var listeners = self.listeners.filter { $0.value != nil }
         listeners.append(.init(value: listener))
         self.listeners = listeners
         
-        let state = self.state[listener.customerKey] ?? false
-        if state {
+        if isLoading {
             listener.cardsControllerDidStartLoadCards(self)
-        } else if let savedCards = cards[listener.customerKey] {
-            listener.cardsControllerDidStopLoadCards(self, result: .success(savedCards))
+        } else if !cachedCards.isEmpty {
+            listener.cardsControllerDidStopLoadCards(self, result: .success(cachedCards))
         }
     }
 }
 
 private extension DefaultCardsController {
-    func notifyListenersAboutLoadingStart(with customerKey: String) {
-        let listeners = self.listeners.filter { $0.value?.customerKey == customerKey }
+    func notifyListenersAboutLoadingStart() {
         listeners.forEach { $0.value?.cardsControllerDidStartLoadCards(self) }
     }
     
-    func notifyListenersAboutLoadingFinish(with customerKey: String, result: Result<[PaymentCard], Error>) {
-        let listeners = self.listeners.filter { $0.value?.customerKey == customerKey }
-        listeners.forEach { $0.value?.cardsControllerDidStopLoadCards(self, result: result) }
+    func callAndResetCompletions(result: Result<[PaymentCard], Error>) {
+        completions.forEach { $0(result) }
+        completions = []
     }
     
-    func callAndResetCompletions(with customerKey: String, result: Result<[PaymentCard], Error>) {
-        completions[customerKey]?.forEach { $0(result) }
-        completions[customerKey] = nil
+    func notifyListenersAboutLoadingFinish(result: Result<[PaymentCard], Error>) {
+        listeners.forEach { $0.value?.cardsControllerDidStopLoadCards(self, result: result) }
     }
 }
 
