@@ -20,24 +20,10 @@
 
 @testable import TinkoffASDKCore
 
-final class MockCardsProviderDelegateDataSource: CardsProviderDataSource, CardsProviderDelegate {
+final class MockCardsProviderDelegateDataSource {
     
     var cards = [PaymentCard]()
     var cardsProviderNeedToLoadCardsCalled = false
     var cardsProviderDeinitCalled = false
     var cardsProviderCardsCalled = false
-    
-    func cardsProviderCards(_ cardsProvider: CardsProvider) -> [PaymentCard] {
-        cardsProviderCardsCalled = true
-        return cards
-    }
-    
-    func cardsProviderNeedToLoadCards(_ cardsProvider: CardsProvider,
-                                      completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
-        cardsProviderNeedToLoadCardsCalled = true
-    }
-    
-    func cardsProviderDeinit(_ cardsProvider: CardsProvider) {
-        cardsProviderDeinitCalled = true
-    }
 }

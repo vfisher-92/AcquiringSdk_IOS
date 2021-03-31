@@ -23,33 +23,30 @@ import Foundation
 final class DefaultCardsProvider: CardsProvider {
     let customerKey: String
     var cards: [PaymentCard] {
-        dataSource.cardsProviderCards(self)
+        cardsController.cards
     }
-    private let delegate: CardsProviderDelegate
-    private let dataSource: CardsProviderDataSource
+    private let cardsController: CardsController
     
     weak var listener: CardsProviderListener?
 
     init(customerKey: String,
-         delegate: CardsProviderDelegate,
-         dataSource: CardsProviderDataSource) {
+         cardsController: CardsController) {
         self.customerKey = customerKey
-        self.delegate = delegate
-        self.dataSource = dataSource
+        self.cardsController = cardsController
     }
     
     deinit {
-        delegate.cardsProviderDeinit(self)
+        cardsController.willDeinitListener(self)
     }
     
     func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
-        delegate.cardsProviderNeedToLoadCards(self, completion: completion)
+        cardsController.loadCards(completion: completion)
     }
 }
 
 // MARK: - CardsControllerListener
 
-extension DefaultCardsProvider {
+extension DefaultCardsProvider: CardsControllerListener {
     func cardsControllerDidStartLoadCards(_ cardsController: CardsController) {
         listener?.cardsProvider(self, didUpdateState: .loading)
     }

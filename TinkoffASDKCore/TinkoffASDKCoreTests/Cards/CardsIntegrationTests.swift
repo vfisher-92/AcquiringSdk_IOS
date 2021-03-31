@@ -39,8 +39,7 @@ class CardsIntegrationTests: XCTestCase {
     func testProviderReturnsCorrectCardAfterLoadCardsFinished() {
         let cardsController = self.cardsController
         let cardsProvider1 = DefaultCardsProvider(customerKey: customerKey,
-                                                  delegate: cardsController,
-                                                  dataSource: cardsController)
+                                                  cardsController: cardsController)
         cardsController.addListener(cardsProvider1)
         
         let expectedCards: [PaymentCard] = [.init(pan: "11111",
@@ -65,13 +64,11 @@ class CardsIntegrationTests: XCTestCase {
         let cardsController = self.cardsController
         
         let cardsProvider1 = DefaultCardsProvider(customerKey: customerKey,
-                                                  delegate: cardsController,
-                                                  dataSource: cardsController)
+                                                  cardsController: cardsController)
         cardsController.addListener(cardsProvider1)
         
         let cardsProvider2 = DefaultCardsProvider(customerKey: customerKey,
-                                                  delegate: cardsController,
-                                                  dataSource: cardsController)
+                                                  cardsController: cardsController)
         cardsController.addListener(cardsProvider2)
         
         let expectedCards: [PaymentCard] = [.init(pan: "11111",
@@ -96,16 +93,14 @@ class CardsIntegrationTests: XCTestCase {
         let cardsController = self.cardsController
         
         let cardsProvider1 = DefaultCardsProvider(customerKey: customerKey,
-                                                  delegate: cardsController,
-                                                  dataSource: cardsController)
+                                                  cardsController: cardsController)
         cardsController.addListener(cardsProvider1)
         
         let cardsProvider1Listener = MockCardsProviderListener()
         cardsProvider1.listener = cardsProvider1Listener
         
         let cardsProvider2 = DefaultCardsProvider(customerKey: customerKey,
-                                                  delegate: cardsController,
-                                                  dataSource: cardsController)
+                                                  cardsController: cardsController)
         cardsController.addListener(cardsProvider2)
         
         let cardsProvider2Listener = MockCardsProviderListener()
@@ -131,13 +126,11 @@ class CardsIntegrationTests: XCTestCase {
         var cardsController: DefaultCardsController? = self.cardsController
         
         var cardsProvider1: DefaultCardsProvider? = DefaultCardsProvider(customerKey: customerKey,
-                                                                         delegate: cardsController!,
-                                                                         dataSource: cardsController!)
+                                                                         cardsController: cardsController!)
         cardsController?.addListener(cardsProvider1!)
         
         var cardsProvider2: DefaultCardsProvider? = DefaultCardsProvider(customerKey: customerKey,
-                                                                         delegate: cardsController!,
-                                                                         dataSource: cardsController!)
+                                                                         cardsController: cardsController!)
         cardsController?.addListener(cardsProvider2!)
         
         weak var weakCardsController = cardsController

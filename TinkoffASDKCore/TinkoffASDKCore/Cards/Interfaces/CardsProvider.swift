@@ -20,15 +20,6 @@
 
 import Foundation
 
-protocol CardsProviderDataSource: AnyObject {
-    func cardsProviderCards(_ cardsProvider: CardsProvider) -> [PaymentCard]
-}
-
-protocol CardsProviderDelegate: AnyObject {
-    func cardsProviderNeedToLoadCards(_ cardsProvider: CardsProvider, completion: @escaping (Result<[PaymentCard], Error>) -> Void)
-    func cardsProviderDeinit(_ cardsProvider: CardsProvider)
-}
-
 protocol CardsProviderListener: AnyObject {
     func cardsProvider(_ cardsProvider: CardsProvider, didUpdateState state: CardsProviderState)
 }
@@ -38,7 +29,7 @@ enum CardsProviderState {
     case data
 }
 
-protocol CardsProvider: CardsControllerListener {
+public protocol CardsProvider {
     var customerKey: String { get }
     var cards: [PaymentCard] { get }
     func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void)

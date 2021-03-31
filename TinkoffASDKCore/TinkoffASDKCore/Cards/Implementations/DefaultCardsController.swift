@@ -68,6 +68,10 @@ final class DefaultCardsController: UpdatableCardsController {
         }
     }
     
+    func willDeinitListener(_ listener: CardsControllerListener) {
+        removeListener(listener)
+    }
+    
     func removeListener(_ listener: CardsControllerListener) {
         let listeners = self.listeners.filter { $0.value !== listener }
         self.listeners = listeners
@@ -98,22 +102,6 @@ private extension DefaultCardsController {
     
     func notifyListenersAboutLoadingFinish(result: Result<[PaymentCard], Error>) {
         listeners.forEach { $0.value?.cardsControllerDidStopLoadCards(self) }
-    }
-}
-
-extension DefaultCardsController: CardsProviderDelegate {
-    func cardsProviderDeinit(_ cardsProvider: CardsProvider) {
-        removeListener(cardsProvider)
-    }
-    
-    func cardsProviderNeedToLoadCards(_ cardsProvider: CardsProvider, completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
-        loadCards(completion: completion)
-    }
-}
-
-extension DefaultCardsController: CardsProviderDataSource {
-    func cardsProviderCards(_ cardsProvider: CardsProvider) -> [PaymentCard] {
-        return cards
     }
 }
 

@@ -30,6 +30,7 @@ protocol CardsControllerListener: AnyObject {
 protocol CardsController {
     var cards: [PaymentCard] { get }
     func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void)
+    func willDeinitListener(_ listener: CardsControllerListener)
 }
 
 protocol UpdatableCardsController: CardsController {

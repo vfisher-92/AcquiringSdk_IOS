@@ -21,6 +21,24 @@
 @testable import TinkoffASDKCore
 
 final class MockCardsController: CardsController {
-    var cards = [PaymentCard]()
-    func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void) {}
+    
+    var loadCardsCalled = false
+    var willDeinitListenerCalled = false
+    var cardsCalled = false
+    
+    var cardsToReturn = [PaymentCard]()
+    
+    
+    var cards: [PaymentCard] {
+        cardsCalled = true
+        return cardsToReturn
+    }
+    
+    func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
+        loadCardsCalled = true
+    }
+    
+    func willDeinitListener(_ listener: CardsControllerListener) {
+        willDeinitListenerCalled = true
+    }
 }

@@ -28,6 +28,9 @@ public enum AcquiringSdkError: Error {
 public final class AcquiringSdk: NSObject {
     private let publicKey: SecKey
     private let coreAssembly: CoreAssembly
+    lazy private var cardsAssembly: CardsAssembly = {
+        CardsAssembly(api: coreAssembly.buildAPI())
+    }()
     private let api: API
     
     public private(set) var languageKey: AcquiringSdkLanguage
@@ -263,5 +266,10 @@ public final class AcquiringSdk: NSObject {
     
     public func threeDSDeviceParamsProvider(screenSize: CGSize) -> ThreeDSDeviceParamsProvider {
         return coreAssembly.threeDSDeviceParamsProvider(screenSize: screenSize, language: languageKey)
+    }
+    
+    public func cardsProvider(customerKey: String,
+                              synchronized: Bool) -> CardsProvider {
+        return cardsAssembly.buildCardsProvider(customerKey: customerKey, synchronized: synchronized)
     }
 }

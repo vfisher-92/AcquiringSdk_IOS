@@ -24,42 +24,35 @@ import XCTest
 class DefaultCardsProviderTests: XCTestCase {
     
     func testDelegateCalledWhenLoadCardsCalled() {
-        let mockCardsProviderDelegateDataSource = MockCardsProviderDelegateDataSource()
-        let provider = DefaultCardsProvider(customerKey: "",
-                                            delegate: mockCardsProviderDelegateDataSource,
-                                            dataSource: mockCardsProviderDelegateDataSource)
+        let cardsController = MockCardsController()
+        let provider = DefaultCardsProvider(customerKey: "", cardsController: cardsController)
         
         provider.loadCards(completion: { _ in })
-        XCTAssertTrue(mockCardsProviderDelegateDataSource.cardsProviderNeedToLoadCardsCalled)
+        XCTAssertTrue(cardsController.loadCardsCalled)
     }
     
     func testDelegateCalledWhenProviderDeinit() {
-        let mockCardsProviderDelegateDataSource = MockCardsProviderDelegateDataSource()
-        var provider: DefaultCardsProvider? = DefaultCardsProvider(customerKey: "",
-                                                                   delegate: mockCardsProviderDelegateDataSource,
-                                                                   dataSource: mockCardsProviderDelegateDataSource)
-        
+        let cardsController = MockCardsController()
+        var provider: DefaultCardsProvider? = DefaultCardsProvider(customerKey: "", cardsController: cardsController)
+
         provider = nil
-        XCTAssertTrue(mockCardsProviderDelegateDataSource.cardsProviderDeinitCalled)
+        XCTAssertTrue(cardsController.willDeinitListenerCalled)
     }
     
     func testDataSourceCalledWhenCardsRequestedFromProvider() {
-        let mockCardsProviderDelegateDataSource = MockCardsProviderDelegateDataSource()
+        let cardsController = MockCardsController()
         let provider = DefaultCardsProvider(customerKey: "",
-                                            delegate: mockCardsProviderDelegateDataSource,
-                                            dataSource: mockCardsProviderDelegateDataSource)
+                                            cardsController: cardsController)
         let _ = provider.cards
-        XCTAssertTrue(mockCardsProviderDelegateDataSource.cardsProviderCardsCalled)
+        XCTAssertTrue(cardsController.cardsCalled)
     }
     
     func testListenerGetCorrectStatesFromProvider() {
-        let mockCardsProviderDelegateDataSource = MockCardsProviderDelegateDataSource()
+        let cardsController = MockCardsController()
         let provider = DefaultCardsProvider(customerKey: "",
-                                            delegate: mockCardsProviderDelegateDataSource,
-                                            dataSource: mockCardsProviderDelegateDataSource)
+                                            cardsController: cardsController)
         
         let listener = MockCardsProviderListener()
-        let cardsController = MockCardsController()
         
         provider.listener = listener
         

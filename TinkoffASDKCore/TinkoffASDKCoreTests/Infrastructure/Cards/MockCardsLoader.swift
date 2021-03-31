@@ -28,10 +28,11 @@ final class MockCardsLoader: CardsLoader {
     
     var loadCardsTimesCalled = 0
     
-    func loadCards(customerKey: String, completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
+    func loadCards(customerKey: String, completion: @escaping (Result<[PaymentCard], Error>) -> Void) -> Cancellable {
         loadCardsTimesCalled += 1
         DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
             completion(self.result)
         }
+        return EmptyCancellable()
     }
 }
