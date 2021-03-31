@@ -126,4 +126,26 @@ class CardsIntegrationTests: XCTestCase {
         
         wait(for: [expectation], timeout: 5.0)
     }
+    
+    func testCardsControllerDeinitIfAllProvidersDeinit() {
+        var cardsController: DefaultCardsController? = self.cardsController
+        
+        var cardsProvider1: DefaultCardsProvider? = DefaultCardsProvider(customerKey: customerKey,
+                                                                         delegate: cardsController!,
+                                                                         dataSource: cardsController!)
+        cardsController?.addListener(cardsProvider1!)
+        
+        var cardsProvider2: DefaultCardsProvider? = DefaultCardsProvider(customerKey: customerKey,
+                                                                         delegate: cardsController!,
+                                                                         dataSource: cardsController!)
+        cardsController?.addListener(cardsProvider2!)
+        
+        weak var weakCardsController = cardsController
+        cardsController = nil
+        
+        XCTAssertNotNil(weakCardsController)
+        cardsProvider1 = nil
+        cardsProvider2 = nil
+        XCTAssertNil(weakCardsController)
+    }
 }
