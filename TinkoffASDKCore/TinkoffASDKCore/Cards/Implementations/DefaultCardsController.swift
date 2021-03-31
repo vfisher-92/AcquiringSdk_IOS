@@ -56,8 +56,8 @@ final class DefaultCardsController: UpdatableCardsController {
                 }
                 
                 self.isLoading = false
-                self.callAndResetCompletions(result: result)
                 self.notifyListenersAboutLoadingFinish(result: result)
+                self.callAndResetCompletions(result: result)
             }
         }
     }
