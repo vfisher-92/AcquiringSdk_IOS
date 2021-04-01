@@ -22,15 +22,8 @@ import Foundation
 
 final class DefaultCardsProvider: CardsProvider {
     let customerKey: String
-    var cards: [PaymentCard] {
-        cardsController.cards.filter { card in
-            var result = true
-            for predicate in predicates {
-                result = result && predicate.predicateClosure(card)
-            }
-            return result
-        }
-    }
+    private(set) var state: CardsProviderState = .data
+    private(set) var cards = [PaymentCard]()
     private let cardsController: CardsController
     private let predicates: [CardsProviderPredicate]
     
@@ -42,14 +35,40 @@ final class DefaultCardsProvider: CardsProvider {
         self.customerKey = customerKey
         self.cardsController = cardsController
         self.predicates = predicates
+        refreshCards()
     }
     
     deinit {
         cardsController.willDeinitListener(self)
     }
     
-    func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
+    func loadCards(completion: ((Result<[PaymentCard], Error>) -> Void)?) {
+        guard Thread.isMainThread else {
+            assertionFailure("call CardsProvider's methods only on Main Thread")
+            return
+        }
         cardsController.loadCards(completion: completion)
+    }
+    
+    func count() -> Int {
+        return cards.count
+    }
+    
+    func card(at index: Int) -> PaymentCard {
+        return cards[index]
+    }
+}
+
+private extension DefaultCardsProvider {
+    func refreshCards() {
+        let filteredCards = cardsController.cards.filter { card in
+            var result = true
+            for predicate in predicates {
+                result = result && predicate.predicateClosure(card)
+            }
+            return result
+        }
+        self.cards = filteredCards
     }
 }
 
@@ -57,10 +76,18 @@ final class DefaultCardsProvider: CardsProvider {
 
 extension DefaultCardsProvider: CardsControllerListener {
     func cardsControllerDidStartLoadCards(_ cardsController: CardsController) {
-        listener?.cardsProvider(self, didUpdateState: .loading)
+        state = .loading
+        listener?.cardsProvider(self, didUpdateState: state)
     }
     
-    func cardsControllerDidStopLoadCards(_ cardsController: CardsController) {
-        listener?.cardsProvider(self, didUpdateState: .data)
+    func cardsControllerDidLoadCards(_ cardsController: CardsController) {
+        state = .data
+        refreshCards()
+        listener?.cardsProvider(self, didUpdateState: state)
+    }
+    
+    func cardsControllerDidFailedLoadCards(_ cardsController: CardsController, error: Error) {
+        state = .error(error)
+        listener?.cardsProvider(self, didUpdateState: state)
     }
 }

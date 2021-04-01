@@ -21,7 +21,6 @@
 import Foundation
 
 final class DefaultCardsController: UpdatableCardsController {
-    
     private let customerKey: String
     private let cardsLoader: CardsLoader
     
@@ -46,8 +45,10 @@ final class DefaultCardsController: UpdatableCardsController {
         request?.cancel()
     }
     
-    func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void) {
-        completions.append(completion)
+    func loadCards(completion: ((Result<[PaymentCard], Error>) -> Void)?) {
+        if let completion = completion {
+            completions.append(completion)
+        }
         notifyListenersAboutLoadingStart()
         
         guard !isLoading else { return }
@@ -85,7 +86,7 @@ final class DefaultCardsController: UpdatableCardsController {
         if isLoading {
             listener.cardsControllerDidStartLoadCards(self)
         } else if !cards.isEmpty {
-            listener.cardsControllerDidStopLoadCards(self)
+            listener.cardsControllerDidLoadCards(self)
         }
     }
 }
@@ -101,7 +102,13 @@ private extension DefaultCardsController {
     }
     
     func notifyListenersAboutLoadingFinish(result: Result<[PaymentCard], Error>) {
-        listeners.forEach { $0.value?.cardsControllerDidStopLoadCards(self) }
+        switch result {
+        case .success:
+            listeners.forEach { $0.value?.cardsControllerDidLoadCards(self) }
+        case let .failure(error):
+            listeners.forEach { $0.value?.cardsControllerDidFailedLoadCards(self, error: error) }
+        }
+        
     }
 }
 

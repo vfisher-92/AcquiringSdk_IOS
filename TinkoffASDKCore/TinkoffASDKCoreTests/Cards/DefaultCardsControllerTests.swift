@@ -41,8 +41,8 @@ final class DefaultCardsControllerTests: XCTestCase {
         
         cardsController.loadCards { _ in }
         
-        XCTAssertTrue(listener1.cardsControllerDidStartLoadCardsWasCalled)
-        XCTAssertTrue(listener2.cardsControllerDidStartLoadCardsWasCalled)
+        XCTAssertTrue(listener1.cardsControllerDidStartLoadCardsCalled)
+        XCTAssertTrue(listener2.cardsControllerDidStartLoadCardsCalled)
     }
     
     func testCardsControllerCallCardsLoaderOneTimeIfCalledLoadCardsTwoTimesInRow() {
@@ -72,7 +72,7 @@ final class DefaultCardsControllerTests: XCTestCase {
         listener1.customerKey = "customerKey1"
         cardsController.addListener(listener1)
 
-        XCTAssertTrue(listener1.cardsControllerDidStartLoadCardsWasCalled)
+        XCTAssertTrue(listener1.cardsControllerDidStartLoadCardsCalled)
     }
 
     func testCardsControllerDoesntNotifyAddedListenerIfLoadingFinished() {
@@ -84,7 +84,7 @@ final class DefaultCardsControllerTests: XCTestCase {
         cardsController.loadCards() { _ in
             let listener1 = MockCardsControllerListener()
             cardsController.addListener(listener1)
-            XCTAssertFalse(listener1.cardsControllerDidStartLoadCardsWasCalled)
+            XCTAssertFalse(listener1.cardsControllerDidStartLoadCardsCalled)
 
             expectation.fulfill()
         }

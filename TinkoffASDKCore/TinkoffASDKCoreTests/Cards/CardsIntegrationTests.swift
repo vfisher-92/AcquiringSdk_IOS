@@ -115,7 +115,7 @@ class CardsIntegrationTests: XCTestCase {
             XCTAssertEqual(cardsProvider2Listener.states, [.loading, .data])
             expectation.fulfill()
         }
-        
+                
         XCTAssertEqual(cardsProvider1Listener.states, [.loading])
         XCTAssertEqual(cardsProvider2Listener.states, [.loading])
         

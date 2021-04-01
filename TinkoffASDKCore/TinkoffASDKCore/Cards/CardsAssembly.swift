@@ -35,31 +35,42 @@ final class CardsAssembly {
     
     func buildCardsProvider(customerKey: String,
                             predicates: [CardsProviderPredicate],
-                            synchronized: Bool) -> CardsProvider {
+                            synchronized: Bool,
+                            listener: CardsProviderListener?) -> CardsProvider {
         if synchronized {
-            return buildSynchronizedCardsProvider(customerKey: customerKey, predicates: predicates)
+            return buildSynchronizedCardsProvider(customerKey: customerKey,
+                                                  predicates: predicates,
+                                                  listener: listener)
         } else {
-            return buildNotSynchronizedCardsProvider(customerKey: customerKey, predicates: predicates)
+            return buildNotSynchronizedCardsProvider(customerKey: customerKey,
+                                                     predicates: predicates,
+                                                     listener: listener)
         }
     }
 }
 
 private extension CardsAssembly {
 
-    func buildSynchronizedCardsProvider(customerKey: String, predicates: [CardsProviderPredicate] = []) -> CardsProvider {
+    func buildSynchronizedCardsProvider(customerKey: String,
+                                        predicates: [CardsProviderPredicate] = [],
+                                        listener: CardsProviderListener?) -> CardsProvider {
         let controller = cardsControllers[customerKey] ?? DefaultCardsController(customerKey: customerKey, cardsLoader: cardsLoader)
         cardsControllers[customerKey] = controller
         
         let provider = DefaultCardsProvider(customerKey: customerKey, cardsController: controller, predicates: predicates)
+        provider.listener = listener
         controller.addListener(provider)
         
         return provider
     }
     
-    func buildNotSynchronizedCardsProvider(customerKey: String, predicates: [CardsProviderPredicate] = []) -> CardsProvider {
+    func buildNotSynchronizedCardsProvider(customerKey: String,
+                                           predicates: [CardsProviderPredicate] = [],
+                                           listener: CardsProviderListener?) -> CardsProvider {
         let controller = DefaultCardsController(customerKey: customerKey, cardsLoader: cardsLoader)
         
         let provider = DefaultCardsProvider(customerKey: customerKey, cardsController: controller, predicates: predicates)
+        provider.listener = listener
         controller.addListener(provider)
                             
         return provider

@@ -116,7 +116,6 @@ public class AcquiringUISDK: NSObject {
     //
     private var acquiringSdk: AcquiringSdk
     private weak var acquiringView: AcquiringView?
-    private weak var cardsListView: CardListDataSourceStatusListener?
     internal var acquiringViewConfiguration: AcquiringViewConfiguration?
     private var acquiringConfiguration: AcquiringConfiguration?
     private let uiSDKConfiguration: AcquiringUISDKConfiguration
@@ -631,14 +630,12 @@ public class AcquiringUISDK: NSObject {
             let viewController = CardsViewController(nibName: "CardsViewController", bundle: Bundle(for: CardsViewController.self))
             viewController.scanerDataSource = modalViewController?.scanerDataSource
             viewController.alertViewHelper = modalViewController?.alertViewHelper
-            self.cardsListView = viewController
             
-            // проверяем, что cardListDataProvider не nil, поэтому мы можем
-            // передать AcquiringUISDK как cardListDataSourceDelegate, иначе при вызове методов протокола AcquiringCardListDataSourceDelegate
-            // будет краш из-за того, что там необходим force unwrap
-            // TODO: Отрефачить эту историю!
-            if self.cardListDataProvider != nil {
-                viewController.cardListDataSourceDelegate = self
+            if let customerKey = customerKey {
+                viewController.cardsProvider = self.acquiringSdk.cardsProvider(customerKey: customerKey,
+                                                                               predicates: .activeCards,
+                                                                               synchronized: true,
+                                                                               listener: viewController)
             }
             
             let cardListNController = UINavigationController(rootViewController: viewController)
@@ -1099,7 +1096,6 @@ extension AcquiringUISDK: CardListDataSourceStatusListener {
     // MARK: CardListDataSourceStatusListener
 
     public func cardsListUpdated(_ status: FetchStatus<[PaymentCard]>) {
-        cardsListView?.cardsListUpdated(status)
         acquiringView?.cardsListUpdated(status)
     }
 }
@@ -1350,29 +1346,23 @@ extension AcquiringUISDK: AcquiringCardListDataSourceDelegate {
             self.presentingViewController = presentingViewController
         }
         
-        setupCardListDataProvider(for: customerKey)
-
         // create
         let modalViewController = CardsViewController(nibName: "CardsViewController", bundle: Bundle(for: CardsViewController.self))
-        // вызов setupCardListDataProvider ранее гарантирует, что cardListDataProvider будет не nil, поэтому мы можем
-        // передать AcquiringUISDK как cardListDataSourceDelegate, иначе при вызове методов протокола AcquiringCardListDataSourceDelegate
-        // будет краш из-за того, что там необходим force unwrap
-        // TODO: Отрефачить эту историю!
-        modalViewController.cardListDataSourceDelegate = self
+        
+        let cardsProvider = acquiringSdk.cardsProvider(customerKey: customerKey,
+                                                       predicates: .activeCards,
+                                                       synchronized: true,
+                                                       listener: modalViewController)
+        modalViewController.cardsProvider = cardsProvider
+        
         modalViewController.title = configuration.viewTitle
 
         modalViewController.scanerDataSource = configuration.scaner
         modalViewController.alertViewHelper = configuration.alertViewHelper
-
         
-        cardsListView = modalViewController
         // present
         let presentationController = UINavigationController(rootViewController: modalViewController)
-        presentingViewController.present(presentationController, animated: true) {
-            _ = presentationController
-            // вызов setupCardListDataProvider выше гарантирует, что cardListDataProvider будет не nil
-            self.cardListDataProvider?.update()
-        }
+        presentingViewController.present(presentationController, animated: true)
     }
 }
 

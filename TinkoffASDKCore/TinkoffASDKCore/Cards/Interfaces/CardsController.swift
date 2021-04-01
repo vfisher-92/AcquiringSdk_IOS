@@ -24,12 +24,13 @@ protocol CardsControllerListener: AnyObject {
     var customerKey: String { get }
     
     func cardsControllerDidStartLoadCards(_ cardsController: CardsController)
-    func cardsControllerDidStopLoadCards(_ cardsController: CardsController)
+    func cardsControllerDidLoadCards(_ cardsController: CardsController)
+    func cardsControllerDidFailedLoadCards(_ cardsController: CardsController, error: Error)
 }
 
 protocol CardsController {
     var cards: [PaymentCard] { get }
-    func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void)
+    func loadCards(completion: ((Result<[PaymentCard], Error>) -> Void)?)
     func willDeinitListener(_ listener: CardsControllerListener)
 }
 

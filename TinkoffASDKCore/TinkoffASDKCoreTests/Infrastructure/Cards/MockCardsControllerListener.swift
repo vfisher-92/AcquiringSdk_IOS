@@ -23,15 +23,20 @@ import Foundation
 
 final class MockCardsControllerListener: CardsControllerListener {
     var customerKey: String = ""
-    var cardsControllerDidStartLoadCardsWasCalled = false
-    var cardsControllerDidStopLoadCardsWasCalled = false
+    var cardsControllerDidStartLoadCardsCalled = false
+    var cardsControllerDidStopLoadCardsCalled = false
+    var cardsControllerDidFailedLoadCardsCalled = false
     var result: Result<[PaymentCard], Error>?
     
     func cardsControllerDidStartLoadCards(_ cardsController: CardsController) {
-        cardsControllerDidStartLoadCardsWasCalled = true
+        cardsControllerDidStartLoadCardsCalled = true
     }
     
-    func cardsControllerDidStopLoadCards(_ cardsController: CardsController) {
-        cardsControllerDidStopLoadCardsWasCalled = true
+    func cardsControllerDidLoadCards(_ cardsController: CardsController) {
+        cardsControllerDidStopLoadCardsCalled = true
+    }
+    
+    func cardsControllerDidFailedLoadCards(_ cardsController: CardsController, error: Error) {
+        cardsControllerDidFailedLoadCardsCalled = true
     }
 }

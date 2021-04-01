@@ -1,6 +1,6 @@
 //
 //
-//  MockCardsController.swift
+//  CardsProviderState+Equatable.swift
 //
 //  Copyright (c) 2021 Tinkoff Bank
 //
@@ -20,25 +20,15 @@
 
 @testable import TinkoffASDKCore
 
-final class MockCardsController: CardsController {
-    
-    var loadCardsCalled = false
-    var willDeinitListenerCalled = false
-    var cardsCalled = false
-    
-    var cardsToReturn = [PaymentCard]()
-    
-    
-    var cards: [PaymentCard] {
-        cardsCalled = true
-        return cardsToReturn
-    }
-    
-    func loadCards(completion: ((Result<[PaymentCard], Error>) -> Void)?) {
-        loadCardsCalled = true
-    }
-    
-    func willDeinitListener(_ listener: CardsControllerListener) {
-        willDeinitListenerCalled = true
+extension CardsProviderState: Equatable {
+
+    public static func == (lhs: CardsProviderState, rhs: CardsProviderState) -> Bool {
+        switch (lhs, rhs) {
+        case (.loading, .loading): return true
+        case (.data, .data): return true
+        case (.error, .error): return true
+        default:
+            return false
+        }
     }
 }

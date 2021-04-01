@@ -57,10 +57,10 @@ class DefaultCardsProviderTests: XCTestCase {
         provider.listener = listener
         
         provider.cardsControllerDidStartLoadCards(cardsController)
-        provider.cardsControllerDidStopLoadCards(cardsController)
-        provider.cardsControllerDidStopLoadCards(cardsController)
+        provider.cardsControllerDidLoadCards(cardsController)
+        provider.cardsControllerDidLoadCards(cardsController)
         provider.cardsControllerDidStartLoadCards(cardsController)
-        provider.cardsControllerDidStopLoadCards(cardsController)
+        provider.cardsControllerDidLoadCards(cardsController)
         
         XCTAssertEqual(listener.states, [.loading, .data, .data, .loading, .data])
     }

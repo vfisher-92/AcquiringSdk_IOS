@@ -20,17 +20,21 @@
 
 import Foundation
 
-protocol CardsProviderListener: AnyObject {
+public protocol CardsProviderListener: AnyObject {
     func cardsProvider(_ cardsProvider: CardsProvider, didUpdateState state: CardsProviderState)
 }
 
-enum CardsProviderState {
+public enum CardsProviderState {
     case loading
     case data
+    case error(Error)
 }
 
 public protocol CardsProvider {
     var customerKey: String { get }
+    var state: CardsProviderState { get }
     var cards: [PaymentCard] { get }
-    func loadCards(completion: @escaping (Result<[PaymentCard], Error>) -> Void)
+    func loadCards(completion: ((Result<[PaymentCard], Error>) -> Void)?)
+    func count() -> Int
+    func card(at index: Int) -> PaymentCard
 }
