@@ -55,6 +55,14 @@ File -> Add packages -> `https://github.com/Tinkoff/AcquiringSdk_IOS.git`
 
 ![spm-products][img-spm-products]
 
+- **TinkoffASDKCore** - если вам нужен только Core функционал без UI части.
+
+- **TinkoffASDKUI** - уже включает в себя Core часть. Полное sdk - Core + UI часть.
+
+<p align="center">
+	<img src=Docs/images/spm_products.png>
+</p>
+
 ## Подготовка к работе
 
 > :warning: **Необходимо хранить сильную ссылку на экземпляр AcquiringUISDK**
