@@ -16,12 +16,25 @@
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>YandexLoginSDK</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>yx9dc6814e39204c638222dede9561ea6f</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>bank100000000000</string>
 		<string>tinkoffbank</string>
+		<string>yandexauth</string>
+		<string>yandexauth2</string>
 		<string>bank100000000001</string>
 		<string>bank100000000002</string>
 		<string>bank100000000003</string>
