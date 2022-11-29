@@ -21,11 +21,12 @@ import PassKit
 import TinkoffASDKCore
 import TinkoffASDKUI
 import UIKit
+import YandexPaySDK
 
 // swiftlint:disable file_length
 class BuyProductsViewController: UIViewController {
 
-    enum TableViewCellType {
+    enum TableViewCellType: CaseIterable {
         case products
         /// открыть экран оплаты и перейти к оплате
         case pay
@@ -41,9 +42,9 @@ class BuyProductsViewController: UIViewController {
         /// оплатить с помощью `Системы Быстрых Платежей`
         /// сгенерировать url для оплаты
         case paySbpUrl
+        /// Оплатить с помощью встроенной кнопки `YandexPay`
+        case yandexPay
     }
-
-    private var tableViewCells: [TableViewCellType] = []
 
     var products: [Product] = []
     var sdk: AcquiringUISDK!
@@ -55,10 +56,23 @@ class BuyProductsViewController: UIViewController {
     var paymentCardId: PaymentCard?
     var paymentCardParentPaymentId: PaymentCard?
 
-    private var rebuidIdCards: [PaymentCard]?
-
     @IBOutlet var tableView: UITableView!
     @IBOutlet var buttonAddToCart: UIBarButtonItem!
+
+    private lazy var yandexPayButtonContainerView: YPButtonContainerView = {
+        let theme: YandexPayButtonTheme
+        if #available(iOS 13.0, *) {
+            theme = YandexPayButtonTheme(appearance: .dark, dynamic: true)
+        } else {
+            theme = YandexPayButtonTheme(appearance: .dark)
+        }
+        let configuration = YandexPayButtonConfiguration(theme: theme)
+        let button = YandexPaySDKApi.instance.createButton(configuration: configuration, asyncDelegate: self)
+        return YPButtonContainerView(button)
+    }()
+
+    private var rebuidIdCards: [PaymentCard]?
+    private let tableViewCells = TableViewCellType.allCases
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,6 +80,7 @@ class BuyProductsViewController: UIViewController {
         title = Loc.Title.paymentSource
 
         tableView.registerCells(types: [ButtonTableViewCell.self])
+        tableView.register(ContainerTableViewCell.self, forCellReuseIdentifier: ContainerTableViewCell.reusableId)
         tableView.delegate = self
         tableView.dataSource = self
 
@@ -79,27 +94,12 @@ class BuyProductsViewController: UIViewController {
             buttonAddToCart.isEnabled = false
             buttonAddToCart.title = nil
         }
-
-        updateTableViewCells()
     }
 
     @IBAction func addToCart(_ sender: Any) {
         if let product = products.first {
             CartDataProvider.shared.addProduct(product)
         }
-    }
-
-    func updateTableViewCells() {
-        tableViewCells = [
-            .products,
-            .pay,
-            .payAndSaveAsParent,
-            .payRequrent,
-        ]
-
-        tableViewCells.append(.payApplePay)
-        tableViewCells.append(.paySbpQrCode)
-        tableViewCells.append(.paySbpUrl)
     }
 
     private func selectRebuildCard() {
@@ -379,7 +379,6 @@ extension BuyProductsViewController: CardListDataSourceStatusListener {
             break
         }
 
-        updateTableViewCells()
         tableView.reloadData()
     }
 }
@@ -531,6 +530,12 @@ extension BuyProductsViewController: UITableViewDataSource {
 
                 return cell
             }
+        case .yandexPay:
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ContainerTableViewCell.reusableId) as? ContainerTableViewCell else {
+                fatalError()
+            }
+            cell.setContent(yandexPayButtonContainerView)
+            return cell
         }
 
         return tableView.defaultCell()
@@ -555,6 +560,8 @@ extension BuyProductsViewController: UITableViewDataSource {
 
         case .paySbpUrl, .paySbpQrCode:
             return Loc.Title.payBySBP
+        case .yandexPay:
+            return "Оплата с помощью YandexPay"
         }
     }
 
@@ -604,6 +611,8 @@ extension BuyProductsViewController: UITableViewDataSource {
             }
 
             return "оплата недоступна"
+        case .yandexPay:
+            return nil
         }
     }
 }
@@ -650,5 +659,42 @@ extension BuyProductsViewController: PKPaymentAuthorizationViewControllerDelegat
                 completion(PKPaymentAuthorizationResult(status: .success, errors: nil))
             }
         }
+    }
+}
+
+// MARK: - YandexPayButtonAsyncDelegate
+
+extension BuyProductsViewController: YandexPayButtonAsyncDelegate {
+    func yandexPayButton(_ button: YandexPayButton, didCompletePaymentWithResult result: YPPaymentResult) {
+        print(result)
+    }
+
+    func yandexPayButtonDidRequestViewControllerForPresentation(_ button: YandexPayButton) -> UIViewController? {
+        self
+    }
+
+    func yandexPayButtonDidRequestPaymentSheet(_ button: YandexPayButton, completion: @escaping (YPPaymentSheet?) -> Void) {
+        let initData = createPaymentData()
+
+        let amount = Double(initData.amount) / 100
+        let orderId = "92" + initData.orderId
+        let order = YPOrder(id: orderId, amount: String(amount))
+
+        let cardMethod = YPCardPaymentMethod(
+            gateway: "Tinkoff",
+            gatewayMerchantId: "92",
+            allowedAuthMethods: [.panOnly],
+            allowedCardNetworks: [.visa, .mastercard, .mir],
+            verificationDetails: true
+        )
+
+        let paymentSheet = YPPaymentSheet(
+            countryCode: .ru,
+            currencyCode: .rub,
+            order: order,
+            paymentMethods: [.card(cardMethod)]
+        )
+
+        completion(paymentSheet)
     }
 }

@@ -32,6 +32,8 @@
 		2CD7522624A36D19005FA56C /* SelectRebuildCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD7522324A36D19005FA56C /* SelectRebuildCardViewController.swift */; };
 		2CFEEE08246EA4910009E633 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2CFEEE07246EA4910009E633 /* InfoPlist.strings */; };
 		4749076CE49DE1C211DB4E08 /* Pods_ASDKSample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C0515196236F7F45BACBF2A /* Pods_ASDKSample.framework */; };
+		57DE3DF32934C3D600FD6F1B /* YPButtonContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DE3DF22934C3D600FD6F1B /* YPButtonContainerView.swift */; };
+		57DE3DF72934ED2C00FD6F1B /* ContainerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DE3DF62934ED2C00FD6F1B /* ContainerTableViewCell.swift */; };
 		57EEFB8A28F409A300809488 /* StageTestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57EEFB8928F409A300809488 /* StageTestData.swift */; };
 		57EEFB8F28F486C200809488 /* SampleTokenProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57EEFB8E28F486C200809488 /* SampleTokenProvider.swift */; };
 		57EEFB9228F544D500809488 /* SHA256.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57EEFB9128F544D500809488 /* SHA256.swift */; };
@@ -86,6 +88,8 @@
 		2CD7522224A36D19005FA56C /* RebuildCardTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RebuildCardTableViewCell.xib; sourceTree = "<group>"; };
 		2CD7522324A36D19005FA56C /* SelectRebuildCardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectRebuildCardViewController.swift; sourceTree = "<group>"; };
 		2CFEEE07246EA4910009E633 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = InfoPlist.strings; sourceTree = "<group>"; };
+		57DE3DF22934C3D600FD6F1B /* YPButtonContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YPButtonContainerView.swift; sourceTree = "<group>"; };
+		57DE3DF62934ED2C00FD6F1B /* ContainerTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerTableViewCell.swift; sourceTree = "<group>"; };
 		57EEFB8928F409A300809488 /* StageTestData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StageTestData.swift; sourceTree = "<group>"; };
 		57EEFB8E28F486C200809488 /* SampleTokenProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleTokenProvider.swift; sourceTree = "<group>"; };
 		57EEFB9128F544D500809488 /* SHA256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHA256.swift; sourceTree = "<group>"; };
@@ -265,6 +269,7 @@
 				B1A4EDDE28F3FD4B004D0C99 /* HorizontalTitleSwitchView.swift */,
 				B1A4EDE028F3FD73004D0C99 /* VerticalEditableView.swift */,
 				B1A4EDE228F3FD86004D0C99 /* CredentialsView.swift */,
+				57DE3DF22934C3D600FD6F1B /* YPButtonContainerView.swift */,
 				B1D01A1128F5A20800D429F4 /* JustButton.swift */,
 			);
 			name = Views;
@@ -274,6 +279,7 @@
 			isa = PBXGroup;
 			children = (
 				B1A4EDDC28F3FCB0004D0C99 /* GenericTableCell.swift */,
+				57DE3DF62934ED2C00FD6F1B /* ContainerTableViewCell.swift */,
 			);
 			name = TableCells;
 			sourceTree = "<group>";
@@ -589,8 +595,10 @@
 				2CA0206523F2CE5700C2AB0E /* UIUtils.swift in Sources */,
 				B156F90E28F06B3700ABABDD /* UIView+Ext.swift in Sources */,
 				B1D01A1428F5AE6000D429F4 /* SdkAssembly.swift in Sources */,
+				57DE3DF72934ED2C00FD6F1B /* ContainerTableViewCell.swift in Sources */,
 				B1A4EDDF28F3FD4B004D0C99 /* HorizontalTitleSwitchView.swift in Sources */,
 				2C6560832476D18800DEA4A9 /* SegmentedTabeViewCell.swift in Sources */,
+				57DE3DF32934C3D600FD6F1B /* YPButtonContainerView.swift in Sources */,
 				2CAEC1A5246D20F20052E07C /* SwitchTableViewCell.swift in Sources */,
 				2CA0205F23F2C01500C2AB0E /* CartTableViewController.swift in Sources */,
 				B1A4EDE328F3FD86004D0C99 /* CredentialsView.swift in Sources */,
