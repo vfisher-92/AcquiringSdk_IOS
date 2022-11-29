@@ -23,7 +23,6 @@
 		2CA0206923F2CFB100C2AB0E /* CartBuyButtonView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CA0206823F2CFB100C2AB0E /* CartBuyButtonView.xib */; };
 		2CA0206D23F2D1F400C2AB0E /* CartEmptyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CA0206B23F2D1F400C2AB0E /* CartEmptyTableViewCell.swift */; };
 		2CA0206E23F2D1F400C2AB0E /* CartEmptyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CA0206C23F2D1F400C2AB0E /* CartEmptyTableViewCell.xib */; };
-		2CA77649245183A90078AEB3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CA77648245183A90078AEB3 /* SceneDelegate.swift */; };
 		2CAE6DE224628FD200F48739 /* ButtonTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CAE6DE024628FD200F48739 /* ButtonTableViewCell.xib */; };
 		2CAE6DE324628FD200F48739 /* ButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CAE6DE124628FD200F48739 /* ButtonTableViewCell.swift */; };
 		2CAEC1A4246D20F20052E07C /* SwitchTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CAEC1A2246D20F20052E07C /* SwitchTableViewCell.xib */; };
@@ -77,7 +76,6 @@
 		2CA0206823F2CFB100C2AB0E /* CartBuyButtonView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CartBuyButtonView.xib; sourceTree = "<group>"; };
 		2CA0206B23F2D1F400C2AB0E /* CartEmptyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartEmptyTableViewCell.swift; sourceTree = "<group>"; };
 		2CA0206C23F2D1F400C2AB0E /* CartEmptyTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CartEmptyTableViewCell.xib; sourceTree = "<group>"; };
-		2CA77648245183A90078AEB3 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		2CAE6DE024628FD200F48739 /* ButtonTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ButtonTableViewCell.xib; sourceTree = "<group>"; };
 		2CAE6DE124628FD200F48739 /* ButtonTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ButtonTableViewCell.swift; sourceTree = "<group>"; };
 		2CAE6DE92462A38200F48739 /* ASDKSampleDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ASDKSampleDebug.entitlements; sourceTree = "<group>"; };
@@ -303,7 +301,6 @@
 			isa = PBXGroup;
 			children = (
 				2C9C7EBE239FBCB200DE4071 /* AppDelegate.swift */,
-				2CA77648245183A90078AEB3 /* SceneDelegate.swift */,
 			);
 			name = App;
 			sourceTree = "<group>";
@@ -607,7 +604,6 @@
 				B1419C5A28D46D96005C61DE /* Assets+Generated.swift in Sources */,
 				57EEFB9228F544D500809488 /* SHA256.swift in Sources */,
 				B156F90C28F0440000ABABDD /* UIEdgeInsets+Ext.swift in Sources */,
-				2CA77649245183A90078AEB3 /* SceneDelegate.swift in Sources */,
 				B1D01A1228F5A20800D429F4 /* JustButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
