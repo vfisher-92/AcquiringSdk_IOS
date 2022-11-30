@@ -693,7 +693,7 @@ public final class AcquiringSdk: NSObject {
         return acquiringAPI.performRequest(request, completion: completion)
     }
 
-    // MARK: - Get Terminal Pay Methods
+    // MARK: Get Terminal Pay Methods
 
     /// Получить информацию о доступных методах оплаты и настройках терминала
     ///
@@ -705,7 +705,7 @@ public final class AcquiringSdk: NSObject {
         return acquiringAPI.performRequest(request, completion: completion)
     }
 
-    // MARK: - Get Certs Config
+    // MARK: Get Certs Config
 
     /// Получить конфигурацию для работы с сертификатами 3DS AppBased
     ///
