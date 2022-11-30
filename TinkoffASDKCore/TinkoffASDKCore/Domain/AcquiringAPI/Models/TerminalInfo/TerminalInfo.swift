@@ -27,6 +27,6 @@ extension TerminalInfo: Decodable {
         payMethods = try container
             .decodeIfPresent([SafeDecodable<TerminalPayMethod>].self, forKey: .payMethods)
             .or([])
-            .compactMap(\.successfullyDecoded)
+            .compactMap(\.decodedValue)
     }
 }

@@ -19,7 +19,7 @@ struct SafeDecodable<DecodableType: Decodable>: Decodable {
 
 extension SafeDecodable {
     /// В случае успешного декодирования возвращает объект, иначе - nil
-    var successfullyDecoded: DecodableType? {
+    var decodedValue: DecodableType? {
         try? decodingResult.get()
     }
 }
