@@ -25,6 +25,7 @@ private extension String {
     static let paySourceKey = "Paysource"
     static let paySourceValue = "SDK"
 
+    // TODO: MIC-7135 Add correct way to handle query parameters in NetworkClient
     static func pathWithQueries(terminalKey: String) -> String {
         "v2/GetTerminalPayMethods?\(Constants.Keys.terminalKey)=\(terminalKey)&\(paySourceKey)=\(paySourceValue)"
     }
