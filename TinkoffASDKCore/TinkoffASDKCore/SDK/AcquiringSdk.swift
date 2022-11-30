@@ -693,6 +693,18 @@ public final class AcquiringSdk: NSObject {
         return acquiringAPI.performRequest(request, completion: completion)
     }
 
+    // MARK: - Get Terminal Pay Methods
+
+    /// Получить информацию о доступных методах оплаты и настройках терминала
+    ///
+    /// - Parameter completion: Callback с результатом запроса. `GetTerminalPayMethodsPayload` - при успехе, `Error` - при ошибке
+    /// - Returns: `Cancellable`
+    @discardableResult
+    public func getTerminalPayMethods(completion: @escaping (Result<GetTerminalPayMethodsPayload, Error>) -> Void) -> Cancellable {
+        let request = acquiringRequests.getTerminalPayMethods()
+        return acquiringAPI.performRequest(request, completion: completion)
+    }
+
     // MARK: - Get Certs Config
 
     /// Получить конфигурацию для работы с сертификатами 3DS AppBased

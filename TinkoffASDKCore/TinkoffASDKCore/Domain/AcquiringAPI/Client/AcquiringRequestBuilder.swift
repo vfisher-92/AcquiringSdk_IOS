@@ -26,6 +26,7 @@ protocol IAcquiringRequestBuilder {
         paymentId: String,
         version: GetTinkoffPayStatusResponse.Status.Version
     ) -> AcquiringRequest
+    func getTerminalPayMethods() -> AcquiringRequest
 }
 
 final class AcquiringRequestBuilder: IAcquiringRequestBuilder {
@@ -135,5 +136,9 @@ final class AcquiringRequestBuilder: IAcquiringRequestBuilder {
         version: GetTinkoffPayStatusResponse.Status.Version
     ) -> AcquiringRequest {
         GetTinkoffLinkRequest(paymentId: paymentId, version: version, baseURL: baseURLProvider.url)
+    }
+
+    func getTerminalPayMethods() -> AcquiringRequest {
+        GetTerminalPayMethods(baseURL: baseURLProvider.url, terminalKey: terminalKeyProvider.value)
     }
 }
