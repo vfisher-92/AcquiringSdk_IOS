@@ -14,7 +14,7 @@ Pod::Spec.new do |spec|
 	spec.swift_version = '5.0'
 	spec.ios.deployment_target = '12.3'
 	spec.source = { :git => 'https://github.com/TinkoffCreditSystems/AcquiringSdk_IOS.git', :tag => spec.version }
-	spec.source_files = 'TinkoffASDKYandexPay/Sources/**/*.swift'
+	spec.source_files = 'TinkoffASDKYandexPay/TinkoffASDKYandexPay/**/*.swift'
 
 	spec.pod_target_xcconfig = { 
 		'CODE_SIGN_IDENTITY' => '' 
