@@ -17,6 +17,7 @@
 //  limitations under the License.
 //
 
+import TinkoffASDKYandexPay
 import UIKit
 import YandexPaySDK
 

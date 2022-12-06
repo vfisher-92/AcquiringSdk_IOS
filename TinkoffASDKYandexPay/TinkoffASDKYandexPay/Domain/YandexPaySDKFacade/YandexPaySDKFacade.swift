@@ -33,9 +33,9 @@ extension YandexPaySDKFacade: IYandexPaySDKButtonBuilder {
     }
 }
 
-// MARK: - IApplicationEventsHandler
+// MARK: - IApplicationEventsReceiver
 
-extension YandexPaySDKFacade: IApplicationEventsHandler {
+extension YandexPaySDKFacade: IApplicationEventsReceiver {
     func applicationWillEnterForeground() {
         YandexPaySDKApi.instance.applicationWillEnterForeground()
     }

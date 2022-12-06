@@ -18,22 +18,22 @@ protocol IYandexPayMethodLoader {
 }
 
 final class YandexPayMethodLoader: IYandexPayMethodLoader {
-    private let coreSDK: AcquiringSdk
+    private let terminalPayMethodsLoader: ITerminalPayMethodsLoader
     private let responseQueue: DispatchQueue
 
-    init(coreSDK: AcquiringSdk, responseQueue: DispatchQueue = .main) {
-        self.coreSDK = coreSDK
+    init(terminalPayMethodsLoader: ITerminalPayMethodsLoader, responseQueue: DispatchQueue = .main) {
+        self.terminalPayMethodsLoader = terminalPayMethodsLoader
         self.responseQueue = responseQueue
     }
 
     func loadMethod(_ completion: @escaping (Result<YandexPayMethod, YandexPayMethodLoaderError>) -> Void) {
-        coreSDK.getTerminalPayMethods { [responseQueue] result in
-            let newResult = result
+        terminalPayMethodsLoader.getTerminalPayMethods { [responseQueue] result in
+            let yandexPayResult = result
                 .mapError(YandexPayMethodLoaderError.loadingError)
                 .flatMap(\.yandexPayMethodResult)
 
             responseQueue.async {
-                completion(newResult)
+                completion(yandexPayResult)
             }
         }
     }

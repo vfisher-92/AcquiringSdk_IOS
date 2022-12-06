@@ -5,10 +5,11 @@
 //  Created by r.akhmadeev on 01.12.2022.
 //
 
+import TinkoffASDKCore
 import UIKit
 import YandexPaySDK
 
-public protocol IYandexPayButtonContainer {
+public protocol IYandexPayButtonContainer: UIView {
     var theme: YandexPayButtonTheme { get }
     func setLoaderVisible(_ visible: Bool, animated: Bool)
     func reloadPersonalizationData(completion: @escaping (Error?) -> Void)
@@ -16,25 +17,34 @@ public protocol IYandexPayButtonContainer {
 }
 
 final class YandexPayButtonContainer: UIView {
-    private var configuration: YandexPayButtonContainerConfiguration
-    private let innerButtonBuilder: IYandexPaySDKButtonBuilder
-    private let innerButtonDelegate: YandexPayButtonAsyncDelegate
+    // MARK: Dependencies
 
-    private lazy var innerButton: YandexPayButton = innerButtonBuilder.createButton(
+    private var configuration: YandexPayButtonContainerConfiguration
+    private let buttonBuilder: IYandexPaySDKButtonBuilder
+    private let controllerBuilder: IYandexPayButtonContainerControllerBuilder
+    private weak var delegate: IYandexPayButtonContainerDelegate?
+
+    // MARK: Lazy Dependencies
+
+    private lazy var yandexPayButton: YandexPayButton = buttonBuilder.createButton(
         configuration: configuration.mappedToYandexPaySDK,
-        asyncDelegate: innerButtonDelegate
+        asyncDelegate: self
     )
+
+    private lazy var controller: IYandexPayButtonContainerController = controllerBuilder.build(with: self)
 
     // MARK: Init
 
     init(
         configuration: YandexPayButtonContainerConfiguration,
-        innerButtonBuilder: IYandexPaySDKButtonBuilder,
-        innerButtonDelegate: YandexPayButtonAsyncDelegate
+        buttonBuilder: IYandexPaySDKButtonBuilder,
+        controllerBuilder: IYandexPayButtonContainerControllerBuilder,
+        delegate: IYandexPayButtonContainerDelegate
     ) {
         self.configuration = configuration
-        self.innerButtonBuilder = innerButtonBuilder
-        self.innerButtonDelegate = innerButtonDelegate
+        self.buttonBuilder = buttonBuilder
+        self.controllerBuilder = controllerBuilder
+        self.delegate = delegate
         super.init(frame: .zero)
         initialSetup()
     }
@@ -47,17 +57,17 @@ final class YandexPayButtonContainer: UIView {
     // MARK: Initial Setup
 
     private func initialSetup() {
-        addSubview(innerButton)
-        innerButton.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(yandexPayButton)
+        yandexPayButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            innerButton.topAnchor.constraint(equalTo: topAnchor),
-            innerButton.leadingAnchor.constraint(equalTo: leadingAnchor),
-            innerButton.trailingAnchor.constraint(equalTo: trailingAnchor),
-            innerButton.bottomAnchor.constraint(equalTo: bottomAnchor),
+            yandexPayButton.topAnchor.constraint(equalTo: topAnchor),
+            yandexPayButton.leadingAnchor.constraint(equalTo: leadingAnchor),
+            yandexPayButton.trailingAnchor.constraint(equalTo: trailingAnchor),
+            yandexPayButton.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
 
         if let cornerRadius = configuration.cornerRadius {
-            innerButton.layer.cornerRadius = cornerRadius
+            yandexPayButton.layer.cornerRadius = cornerRadius
         }
     }
 }
@@ -70,16 +80,62 @@ extension YandexPayButtonContainer: IYandexPayButtonContainer {
     }
 
     func setLoaderVisible(_ visible: Bool, animated: Bool) {
-        innerButton.setLoaderVisible(visible, animated: animated)
+        yandexPayButton.setLoaderVisible(visible, animated: animated)
     }
 
     func reloadPersonalizationData(completion: @escaping (Error?) -> Void) {
-        innerButton.reloadPersonalizationData(completion: completion)
+        yandexPayButton.reloadPersonalizationData(completion: completion)
     }
 
     func setTheme(_ theme: YandexPayButtonTheme, animated: Bool) {
         configuration = configuration.copyReplacing(theme: theme)
-        innerButton.setTheme(configuration.theme.mappedToYandexPaySDK, animated: animated)
+        yandexPayButton.setTheme(theme.mappedToYandexPaySDK, animated: animated)
+    }
+}
+
+// MARK: - YandexPayButtonAsyncDelegate
+
+extension YandexPayButtonContainer: YandexPayButtonAsyncDelegate {
+    func yandexPayButtonDidRequestViewControllerForPresentation(_ button: YandexPaySDK.YandexPayButton) -> UIViewController? {
+        controller.requestViewControllerForPresentation()
+    }
+
+    func yandexPayButtonDidRequestPaymentSheet(
+        _ button: YandexPaySDK.YandexPayButton,
+        completion: @escaping (YandexPaySDK.YPPaymentSheet?) -> Void
+    ) {
+        controller.requestPaymentSheet(completion: completion)
+    }
+
+    func yandexPayButton(
+        _ button: YandexPaySDK.YandexPayButton,
+        didCompletePaymentWithResult result: YandexPaySDK.YPPaymentResult
+    ) {
+        controller.handlePaymentResult(result)
+    }
+}
+
+// MARK: - IYandexPayButtonContainerControllerDelegate
+
+extension YandexPayButtonContainer: IYandexPayButtonContainerControllerDelegate {
+    func yandexPayControllerDidRequestViewControllerForPresentation(
+        _ controller: IYandexPayButtonContainerController
+    ) -> UIViewController? {
+        delegate?.yandexPayButtonContainerDidRequestViewControllerForPresentation(self)
+    }
+
+    func yandexPayController(
+        _ controller: IYandexPayButtonContainerController,
+        didRequestPaymentData completion: @escaping (TinkoffASDKCore.PaymentInitData?) -> Void
+    ) {
+        delegate?.yandexPayButtonContainerDidRequestInitData(self, completion: completion)
+    }
+
+    func yandexPayController(
+        _ controller: YandexPayButtonContainerController,
+        didCompleteWithResult result: YandexPayButtonContainerResult
+    ) {
+        delegate?.yandexPayButtonContainer(self, didCompletePaymentWithResult: result)
     }
 }
 
