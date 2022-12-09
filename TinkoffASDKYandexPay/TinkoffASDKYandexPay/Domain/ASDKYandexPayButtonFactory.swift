@@ -9,7 +9,7 @@ import Foundation
 import YandexPaySDK
 
 protocol IYandexPayButtonContainerControllerBuilder {
-    func build(with delegate: IYandexPayButtonContainerControllerDelegate) -> IYandexPayButtonContainerController
+    func build(with delegate: IYandexPayControllerDelegate) -> IYandexPayController
 }
 
 protocol IYandexPayButtonContainerBuilder {

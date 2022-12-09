@@ -674,6 +674,7 @@ extension BuyProductsViewController: YandexPayButtonAsyncDelegate {
     }
 
     func yandexPayButtonDidRequestPaymentSheet(_ button: YandexPayButton, completion: @escaping (YPPaymentSheet?) -> Void) {
+        return completion(nil)
         let initData = createPaymentData()
 
         let amount = Double(initData.amount) / 100
@@ -681,10 +682,10 @@ extension BuyProductsViewController: YandexPayButtonAsyncDelegate {
         let order = YPOrder(id: orderId, amount: String(amount))
 
         let cardMethod = YPCardPaymentMethod(
-            gateway: "Tinkoff",
+            gateway: "tinkoff",
             gatewayMerchantId: "92",
             allowedAuthMethods: [.panOnly],
-            allowedCardNetworks: [.visa, .mastercard, .mir],
+            allowedCardNetworks: [.visa, .mastercard, .mir, .unionPay, .discover, .visaElectron, .maestro],
             verificationDetails: true
         )
 

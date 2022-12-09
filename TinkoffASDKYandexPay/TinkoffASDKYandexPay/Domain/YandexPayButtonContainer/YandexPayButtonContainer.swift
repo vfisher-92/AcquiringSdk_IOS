@@ -31,7 +31,7 @@ final class YandexPayButtonContainer: UIView {
         asyncDelegate: self
     )
 
-    private lazy var controller: IYandexPayButtonContainerController = controllerBuilder.build(with: self)
+    private lazy var controller: IYandexPayController = controllerBuilder.build(with: self)
 
     // MARK: Init
 
@@ -97,7 +97,7 @@ extension YandexPayButtonContainer: IYandexPayButtonContainer {
 
 extension YandexPayButtonContainer: YandexPayButtonAsyncDelegate {
     func yandexPayButtonDidRequestViewControllerForPresentation(_ button: YandexPaySDK.YandexPayButton) -> UIViewController? {
-        controller.requestViewControllerForPresentation()
+        delegate?.yandexPayButtonContainerDidRequestViewControllerForPresentation(self)
     }
 
     func yandexPayButtonDidRequestPaymentSheet(
@@ -117,22 +117,22 @@ extension YandexPayButtonContainer: YandexPayButtonAsyncDelegate {
 
 // MARK: - IYandexPayButtonContainerControllerDelegate
 
-extension YandexPayButtonContainer: IYandexPayButtonContainerControllerDelegate {
+extension YandexPayButtonContainer: IYandexPayControllerDelegate {
     func yandexPayControllerDidRequestViewControllerForPresentation(
-        _ controller: IYandexPayButtonContainerController
+        _ controller: IYandexPayController
     ) -> UIViewController? {
         delegate?.yandexPayButtonContainerDidRequestViewControllerForPresentation(self)
     }
 
     func yandexPayController(
-        _ controller: IYandexPayButtonContainerController,
+        _ controller: IYandexPayController,
         didRequestPaymentData completion: @escaping (TinkoffASDKCore.PaymentInitData?) -> Void
     ) {
         delegate?.yandexPayButtonContainerDidRequestInitData(self, completion: completion)
     }
 
     func yandexPayController(
-        _ controller: YandexPayButtonContainerController,
+        _ controller: YandexPayController,
         didCompleteWithResult result: YandexPayButtonContainerResult
     ) {
         delegate?.yandexPayButtonContainer(self, didCompletePaymentWithResult: result)
