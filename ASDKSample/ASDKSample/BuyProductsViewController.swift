@@ -20,8 +20,8 @@
 import PassKit
 import TinkoffASDKCore
 import TinkoffASDKUI
+import TinkoffASDKYandexPay
 import UIKit
-import YandexPaySDK
 
 // swiftlint:disable file_length
 class BuyProductsViewController: UIViewController {
@@ -59,16 +59,13 @@ class BuyProductsViewController: UIViewController {
     @IBOutlet var tableView: UITableView!
     @IBOutlet var buttonAddToCart: UIBarButtonItem!
 
-    private lazy var yandexPayButtonContainerView: YPButtonContainerView = {
-        let theme: YandexPayButtonTheme
-        if #available(iOS 13.0, *) {
-            theme = YandexPayButtonTheme(appearance: .dark, dynamic: true)
-        } else {
-            theme = YandexPayButtonTheme(appearance: .dark)
-        }
-        let configuration = YandexPayButtonConfiguration(theme: theme)
-        let button = YandexPaySDKApi.instance.createButton(configuration: configuration, asyncDelegate: self)
-        return YPButtonContainerView(button)
+    private lazy var yandexPayButtonContainerView: UIView = {
+        let builder = YandexPayButtonContainerBuilder(paymentControllerBuilder: self)
+        let theme = YandexPayButtonTheme(appearance: .dark)
+        let configuration = YandexPayButtonContainerConfiguration(theme: theme)
+        let button = builder.build(with: configuration, delegate: self)
+        let container = YPButtonContainerView(button)
+        return container
     }()
 
     private var rebuidIdCards: [PaymentCard]?
@@ -662,40 +659,32 @@ extension BuyProductsViewController: PKPaymentAuthorizationViewControllerDelegat
     }
 }
 
-// MARK: - YandexPayButtonAsyncDelegate
+// MARK: - IYandexPayButtonContainerDelegate
 
-extension BuyProductsViewController: YandexPayButtonAsyncDelegate {
-    func yandexPayButton(_ button: YandexPayButton, didCompletePaymentWithResult result: YPPaymentResult) {
-        print(result)
+extension BuyProductsViewController: IYandexPayButtonContainerDelegate {
+    func yandexPayButtonContainerDidRequestInitData(
+        _ container: IYandexPayButtonContainer,
+        completion: @escaping (PaymentInitData?) -> Void
+    ) {
+        completion(createPaymentData())
     }
 
-    func yandexPayButtonDidRequestViewControllerForPresentation(_ button: YandexPayButton) -> UIViewController? {
+    func yandexPayButtonContainerDidRequestViewControllerForPresentation(
+        _ container: IYandexPayButtonContainer
+    ) -> UIViewController? {
         self
     }
 
-    func yandexPayButtonDidRequestPaymentSheet(_ button: YandexPayButton, completion: @escaping (YPPaymentSheet?) -> Void) {
-        return completion(nil)
-        let initData = createPaymentData()
+    func yandexPayButtonContainer(
+        _ container: IYandexPayButtonContainer,
+        didCompletePaymentWithResult result: YandexPayButtonContainerResult
+    ) {
+        print(result)
+    }
+}
 
-        let amount = Double(initData.amount) / 100
-        let orderId = "92" + initData.orderId
-        let order = YPOrder(id: orderId, amount: String(amount))
-
-        let cardMethod = YPCardPaymentMethod(
-            gateway: "tinkoff",
-            gatewayMerchantId: "92",
-            allowedAuthMethods: [.panOnly],
-            allowedCardNetworks: [.visa, .mastercard, .mir, .unionPay, .discover, .visaElectron, .maestro],
-            verificationDetails: true
-        )
-
-        let paymentSheet = YPPaymentSheet(
-            countryCode: .ru,
-            currencyCode: .rub,
-            order: order,
-            paymentMethods: [.card(cardMethod)]
-        )
-
-        completion(paymentSheet)
+extension BuyProductsViewController: IPaymentControllerBuilder {
+    func build(uiProvider: PaymentControllerUIProvider, delegate: PaymentControllerDelegate) -> PaymentController {
+        sdk.paymentController(uiProvider: uiProvider, delegate: delegate)
     }
 }
