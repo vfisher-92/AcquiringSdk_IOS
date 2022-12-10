@@ -12,6 +12,7 @@ struct GetTerminalPayMethods: AcquiringRequest {
     let path: String
     let httpMethod: HTTPMethod = .get
     let tokenFormationStrategy: TokenFormationStrategy = .none
+    let terminalKeyProvidingStrategy: TerminalKeyProvidingStrategy = .never
 
     init(baseURL: URL, terminalKey: String) {
         self.baseURL = baseURL
