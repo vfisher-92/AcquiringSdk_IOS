@@ -65,8 +65,6 @@ struct PaymentFactory: IPaymentFactory {
                 paymentFlow: paymentFlow,
                 delegate: paymentDelegate
             )
-        case .unknown:
-            return nil
         }
     }
 }

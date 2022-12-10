@@ -71,18 +71,21 @@ private extension HTTPParameters {
         publicKey: SecKey
     ) -> HTTPParameters {
         var parameters: HTTPParameters = [Constants.Keys.paymentId: data.paymentId]
+
         if let sendEmail = data.sendEmail {
             parameters[Constants.Keys.sendEmail] = sendEmail
         }
+
         if let infoEmail = data.infoEmail {
             parameters[Constants.Keys.infoEmail] = infoEmail
         }
+
         if let ipAddress = data.ipAddress {
             parameters[Constants.Keys.ipAddress] = ipAddress
         }
-        if let deviceInfo = data.deviceInfo,
-           let deviceInfoJSON = try? deviceInfo.encode2JSONObject() {
-            parameters[Constants.Keys.data] = deviceInfoJSON
+
+        if let deviceInfo = try? data.deviceInfo?.encode2JSONObject() {
+            parameters[Constants.Keys.data] = deviceInfo
         }
 
         switch data.paymentSource {

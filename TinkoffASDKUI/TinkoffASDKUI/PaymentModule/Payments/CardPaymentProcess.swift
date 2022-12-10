@@ -108,7 +108,7 @@ private extension CardPaymentProcess {
         currentRequest?.store(newValue: request)
     }
 
-    func finishPayment(data: FinishAuthorizeData, threeDSVersion: String? = nil) {
+    func finishAuthorize(data: FinishAuthorizeData, threeDSVersion: String? = nil) {
         let request = paymentsService.finishAuthorize(data: data) { [weak self] result in
             guard let self = self else { return }
             guard !self.isCancelled.wrappedValue else { return }
@@ -137,7 +137,7 @@ private extension CardPaymentProcess {
                 infoEmail: customerEmail
             )
 
-            finishPayment(data: data)
+            finishAuthorize(data: data)
         case .parentPayment:
             // Log error
             assertionFailure("Only cardNumber, savedCard or paymentData PaymentSourceData available")
@@ -150,9 +150,7 @@ private extension CardPaymentProcess {
             let check3DSData = Checking3DSURLData(
                 tdsServerTransID: tdsServerTransID,
                 threeDSMethodURL: threeDSMethodURL,
-                notificationURL: threeDsService
-                    .confirmation3DSCompleteV2URL()
-                    .absoluteString
+                notificationURL: threeDsService.confirmation3DSCompleteV2URL().absoluteString
             )
 
             delegate?.payment(self, needToCollect3DSData: check3DSData) { [weak self] deviceInfo in
@@ -166,7 +164,7 @@ private extension CardPaymentProcess {
                     ipAddress: self.ipProvider.ipAddress?.fullStringValue,
                     threeDSVersion: payload.version
                 )
-                self.finishPayment(data: data, threeDSVersion: payload.version)
+                self.finishAuthorize(data: data, threeDSVersion: payload.version)
             }
         } else {
             let data = FinishAuthorizeData(
@@ -174,7 +172,7 @@ private extension CardPaymentProcess {
                 paymentSource: paymentSource,
                 infoEmail: customerEmail
             )
-            finishPayment(data: data, threeDSVersion: payload.version)
+            finishAuthorize(data: data, threeDSVersion: payload.version)
         }
     }
 
