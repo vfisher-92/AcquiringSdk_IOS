@@ -201,7 +201,6 @@ public final class AcquiringSdk: NSObject {
             paymentSource: data.paymentSource,
             infoEmail: data.infoEmail,
             deviceInfo: data.deviceInfo,
-            ipAddress: data.ipAddress,
             threeDSVersion: data.threeDSVersion,
             source: data.source,
             route: data.route

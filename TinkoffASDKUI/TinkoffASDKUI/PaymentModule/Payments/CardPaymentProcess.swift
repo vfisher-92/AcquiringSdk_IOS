@@ -161,7 +161,6 @@ private extension CardPaymentProcess {
                     paymentSource: self.paymentSource,
                     infoEmail: self.customerEmail,
                     deviceInfo: deviceInfo,
-                    ipAddress: self.ipProvider.ipAddress?.fullStringValue,
                     threeDSVersion: payload.version
                 )
                 self.finishAuthorize(data: data, threeDSVersion: payload.version)
