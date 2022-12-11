@@ -751,7 +751,7 @@ public class AcquiringUISDK: NSObject {
         paymentId: Int64,
         completionHandler: @escaping PaymentCompletionHandler
     ) {
-        let sourceData = PaymentSourceData.paymentData(paymentToken.paymentData.base64EncodedString())
+        let sourceData = PaymentSourceData.applePay(base64Token: paymentToken.paymentData.base64EncodedString())
         let finishAuthorizeData = PaymentFinishRequestData(
             paymentId: paymentId,
             paymentSource: sourceData,
@@ -1906,7 +1906,7 @@ extension AcquiringUISDK: PKPaymentAuthorizationViewControllerDelegate {
         handler completion: @escaping (PKPaymentAuthorizationResult) -> Void
     ) {
         if let paymentId = paymentInitResponseData?.paymentId {
-            let paymentDataSource = PaymentSourceData.paymentData(payment.token.paymentData.base64EncodedString())
+            let paymentDataSource = PaymentSourceData.applePay(base64Token: payment.token.paymentData.base64EncodedString())
             let data = PaymentFinishRequestData(
                 paymentId: paymentId,
                 paymentSource: paymentDataSource,

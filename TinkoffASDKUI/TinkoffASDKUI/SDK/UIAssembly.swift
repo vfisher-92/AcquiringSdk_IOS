@@ -44,6 +44,7 @@ private extension UIAssembly {
         return PaymentFactory(
             paymentsService: acquiringSDK,
             threeDsService: acquiringSDK,
+            threeDSDeviceInfoProvider: acquiringSDK.threeDSDeviceInfoProvider(),
             ipProvider: ipProvider
         )
     }

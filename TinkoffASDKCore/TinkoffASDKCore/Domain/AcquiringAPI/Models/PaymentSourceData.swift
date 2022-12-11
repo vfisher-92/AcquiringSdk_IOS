@@ -33,8 +33,14 @@ public enum PaymentSourceData: Equatable {
     /// При оплате с помощью **ApplePay**
     ///
     /// - Parameters:
-    ///   - string: UTF-8 encoded JSON dictionary of encrypted payment data from `PKPaymentToken.paymentData`
-    case paymentData(String)
+    ///   - base64Token: UTF-8 encoded JSON dictionary of encrypted payment data from `PKPaymentToken.paymentData`
+    case applePay(base64Token: String)
+
+    /// При оплате с помощью **YandexPay**
+    ///
+    /// - Parameters:
+    ///   - base64Token: Токен, полученный из `YPPaymentInfo.paymentToken`
+    case yandexPay(base64Token: String)
 }
 
 // MARK: - Helpers

@@ -90,11 +90,16 @@ private extension HTTPParameters {
             if let encryptedCardData = encryptor.encrypt(string: formattedCardData, publicKey: publicKey) {
                 parameters[Constants.Keys.cardData] = encryptedCardData
             }
-        case let .paymentData(data):
-            parameters[Constants.Keys.encryptedPaymentData] = data
+        case let .applePay(base64Token):
+            parameters[Constants.Keys.encryptedPaymentData] = base64Token
             parameters[Constants.Keys.route] = Constants.Values.acq
             parameters[Constants.Keys.source] = Constants.Values.applePaySource
-        default: break
+        case let .yandexPay(base64Token):
+            parameters[Constants.Keys.encryptedPaymentData] = base64Token
+            parameters[Constants.Keys.route] = Constants.Values.acq
+            parameters[Constants.Keys.source] = Constants.Values.yandexPaySource
+        case .parentPayment:
+            break
         }
 
         return parameters

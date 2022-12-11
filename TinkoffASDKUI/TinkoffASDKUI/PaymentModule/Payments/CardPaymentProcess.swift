@@ -23,6 +23,7 @@ final class CardPaymentProcess: PaymentProcess {
 
     private let paymentsService: IAcquiringPaymentsService
     private let threeDsService: IAcquiringThreeDSService
+    private let threeDSDeviceInfoProvider: IThreeDSDeviceInfoProvider
     private let ipProvider: IIPAddressProvider
     private var isCancelled = Atomic(wrappedValue: false)
     private var currentRequest: Atomic<Cancellable>?
@@ -45,6 +46,7 @@ final class CardPaymentProcess: PaymentProcess {
     init(
         paymentsService: IAcquiringPaymentsService,
         threeDsService: IAcquiringThreeDSService,
+        threeDSDeviceInfoProvider: IThreeDSDeviceInfoProvider,
         ipProvider: IIPAddressProvider,
         paymentSource: PaymentSourceData,
         paymentFlow: PaymentFlow,
@@ -53,6 +55,7 @@ final class CardPaymentProcess: PaymentProcess {
 
         self.paymentsService = paymentsService
         self.threeDsService = threeDsService
+        self.threeDSDeviceInfoProvider = threeDSDeviceInfoProvider
         self.ipProvider = ipProvider
         self.paymentSource = paymentSource
         self.paymentFlow = paymentFlow
@@ -130,11 +133,19 @@ private extension CardPaymentProcess {
         switch paymentSource {
         case .cardNumber, .savedCard:
             check3DSVersion(data: Check3DSVersionData(paymentId: payload.paymentId, paymentSource: paymentSource))
-        case .paymentData:
+        case .applePay:
             let data = FinishAuthorizeData(
                 paymentId: payload.paymentId,
                 paymentSource: paymentSource,
                 infoEmail: customerEmail
+            )
+            finishAuthorize(data: data)
+        case .yandexPay:
+            let data = FinishAuthorizeData(
+                paymentId: payload.paymentId,
+                paymentSource: paymentSource,
+                infoEmail: customerEmail,
+                deviceInfo: threeDSDeviceInfoProvider.deviceInfo
             )
 
             finishAuthorize(data: data)
