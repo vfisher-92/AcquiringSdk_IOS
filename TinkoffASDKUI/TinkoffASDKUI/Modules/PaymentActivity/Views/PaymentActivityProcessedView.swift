@@ -22,21 +22,10 @@ final class PaymentActivityProcessedView: UIView {
         return imageView
     }()
 
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 20, weight: .bold)
-        label.textAlignment = .center
-        return label
-    }()
-
-    private lazy var descriptionLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 17, weight: .regular)
-        label.numberOfLines = .zero
-        label.textAlignment = .center
-        return label
-    }()
-
+    private lazy var titleLabel = UILabel(style: .headingM.set(alignment: .center))
+    private lazy var descriptionLabel = UILabel(
+        style: .bodyL.set(alignment: .center).set(textColor: ASDKColors.Text.secondary)
+    )
     private lazy var primaryButton = Button()
 
     // MARK: Init
