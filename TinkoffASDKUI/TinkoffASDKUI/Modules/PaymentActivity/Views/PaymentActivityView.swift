@@ -7,25 +7,45 @@
 
 import UIKit
 
-enum PaymentActivityViewState {
-    case loading
-    case succeeded
-    case failed
+protocol PaymentActivityViewDelegate: AnyObject {
+    func paymentActivityView(
+        _ paymentActivityView: PaymentActivityView,
+        didChangeStateFrom oldState: PaymentActivityViewState,
+        to newState: PaymentActivityViewState
+    )
+
+    func paymentActivityView(
+        _ paymentActivityView: PaymentActivityView,
+        didTapPrimaryButtonWithState state: PaymentActivityViewState
+    )
 }
 
 final class PaymentActivityView: UIView {
-    // MARK: State
+    weak var delegate: PaymentActivityViewDelegate?
+    private(set) var state: PaymentActivityViewState = .idle
 
-    var state: PaymentActivityViewState = .loading
+    // MARK: Subviews
 
-    // MARK: UI
+    private lazy var loadingView = PaymentActivityLoadingView()
+    private lazy var loadedView = PaymentActivityLoadedView(delegate: self)
 
-    private lazy var loadingView = PaymentActivityLoadingView(
-        configuration: PaymentActivityLoadingView.Configuration(
-            title: "Обрабатываем платеж",
-            description: "Это займет некоторое время&Это займет некоторое время&Это займет некоторое время&Это займет некоторое время&"
-        )
-    )
+    // MARK: Constraints
+
+    private lazy var loadingViewConstraints: [NSLayoutConstraint] = [
+        loadingView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: .commonTopInset),
+        loadingView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .loadingHorizontalInset),
+        loadingView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.loadingHorizontalInset),
+        loadingView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -.commonBottomInset)
+            .with(priority: .fittingSizeLevel),
+    ]
+
+    private lazy var loadedViewConstraints: [NSLayoutConstraint] = [
+        loadedView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: .commonTopInset),
+        loadedView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .loadedHorizontalInset),
+        loadedView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.loadedHorizontalInset),
+        loadedView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -.commonBottomInset)
+            .with(priority: .fittingSizeLevel),
+    ]
 
     // MARK: Init
 
@@ -34,9 +54,44 @@ final class PaymentActivityView: UIView {
         setupView()
     }
 
+    convenience init(delegate: PaymentActivityViewDelegate) {
+        self.init(frame: .zero)
+        self.delegate = delegate
+    }
+
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: View Updating
+
+    func update(with state: PaymentActivityViewState, animated: Bool = true) {
+        guard self.state != state else { return }
+        let oldState = self.state
+        self.state = state
+
+        switch state {
+        case .idle:
+            loadingView.isHidden = true
+            NSLayoutConstraint.deactivate(loadingViewConstraints)
+            loadedView.isHidden = true
+            NSLayoutConstraint.deactivate(loadedViewConstraints)
+        case let .loading(state):
+            loadingView.isHidden = false
+            NSLayoutConstraint.activate(loadingViewConstraints)
+            loadingView.update(with: state)
+            loadedView.isHidden = true
+            NSLayoutConstraint.deactivate(loadedViewConstraints)
+        case let .loaded(state):
+            loadingView.isHidden = true
+            NSLayoutConstraint.deactivate(loadingViewConstraints)
+            loadedView.isHidden = false
+            NSLayoutConstraint.activate(loadedViewConstraints)
+            loadedView.update(with: state)
+        }
+
+        delegate?.paymentActivityView(self, didChangeStateFrom: oldState, to: state)
     }
 
     // MARK: Initial Configuration
@@ -44,15 +99,20 @@ final class PaymentActivityView: UIView {
     private func setupView() {
         addSubview(loadingView)
         loadingView.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            loadingView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: .topInset),
-            loadingView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            loadingView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            loadingView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -.bottomInset).with(priority: .fittingSizeLevel),
-        ])
+        addSubview(loadedView)
+        loadedView.translatesAutoresizingMaskIntoConstraints = false
     }
 }
+
+// MARK: - PaymentActivityLoadedViewDelegate
+
+extension PaymentActivityView: PaymentActivityLoadedViewDelegate {
+    func paymentActivityLoadedViewDidTapPrimaryButton(_ view: PaymentActivityLoadedView) {
+        delegate?.paymentActivityView(self, didTapPrimaryButtonWithState: state)
+    }
+}
+
+// MARK: - PaymentActivityView + Estimated Height
 
 extension PaymentActivityView {
     var estimatedHeight: CGFloat {
@@ -64,10 +124,13 @@ extension PaymentActivityView {
     }
 }
 
+// MARK: - Constants
+
 private extension CGFloat {
-    static let topInset: CGFloat = 24
-    static let horizontalInset: CGFloat = 23.5
-    static let bottomInset: CGFloat = 24
+    static let commonTopInset: CGFloat = 24
+    static let commonBottomInset: CGFloat = 24
+    static let loadedHorizontalInset: CGFloat = 16
+    static let loadingHorizontalInset: CGFloat = 23.5
 }
 
 extension NSLayoutConstraint {

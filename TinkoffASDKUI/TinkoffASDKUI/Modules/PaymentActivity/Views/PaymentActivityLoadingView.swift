@@ -8,16 +8,9 @@
 import Foundation
 
 final class PaymentActivityLoadingView: UIView {
-    // MARK: Configuration
+    // MARK: Subviews
 
-    struct Configuration {
-        let title: String
-        let description: String
-    }
-
-    // MARK: UI
-
-    private lazy var activityIndicator = ActivityIndicatorView(style: .paymentActivity)
+    private lazy var activityIndicator = ActivityIndicatorView(style: .xlYellow)
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -41,11 +34,6 @@ final class PaymentActivityLoadingView: UIView {
         setupView()
     }
 
-    convenience init(configuration: Configuration) {
-        self.init(frame: .zero)
-        update(configuration: configuration)
-    }
-
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -53,9 +41,9 @@ final class PaymentActivityLoadingView: UIView {
 
     // MARK: View Updating
 
-    func update(configuration: Configuration) {
-        titleLabel.text = configuration.title
-        descriptionLabel.text = configuration.description
+    func update(with state: PaymentActivityViewState.Loading) {
+        titleLabel.text = state.title
+        descriptionLabel.text = state.description
     }
 
     // MARK: Initial Configuration
@@ -69,16 +57,7 @@ final class PaymentActivityLoadingView: UIView {
         stack.setCustomSpacing(.titleBottomInset, after: titleLabel)
 
         addSubview(stack)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(greaterThanOrEqualTo: topAnchor),
-            stack.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: .stackHorizontalInset),
-            stack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -.stackHorizontalInset),
-            stack.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor),
-            stack.centerXAnchor.constraint(equalTo: centerXAnchor),
-            stack.centerYAnchor.constraint(equalTo: centerYAnchor),
-        ])
+        stack.pinEdgesToSuperview()
     }
 }
 
@@ -88,16 +67,4 @@ private extension CGFloat {
     static let indicatorBottomInset: CGFloat = 20
     static let titleBottomInset: CGFloat = 8
     static let stackHorizontalInset: CGFloat = 23.5
-}
-
-// MARK: - ActivityIndicatorView + Style
-
-extension ActivityIndicatorView.Style {
-    static var paymentActivity: ActivityIndicatorView.Style {
-        ActivityIndicatorView.Style(
-            lineColor: ASDKColors.yellow,
-            diameter: 72,
-            width: 4
-        )
-    }
 }
