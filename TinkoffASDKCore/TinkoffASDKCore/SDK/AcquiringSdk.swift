@@ -132,8 +132,8 @@ public final class AcquiringSdk: NSObject {
         threeDSFacade.threeDSWebViewHandler()
     }
 
-    public func threeDSDeviceParamsProvider(screenSize: CGSize) -> ThreeDSDeviceParamsProvider {
-        threeDSFacade.deviceParamsProvider(screenSize: screenSize)
+    public func threeDSDeviceInfoProvider() -> IThreeDSDeviceInfoProvider {
+        threeDSFacade.threeDSDeviceInfoProvider()
     }
 
     // MARK: Init Payment

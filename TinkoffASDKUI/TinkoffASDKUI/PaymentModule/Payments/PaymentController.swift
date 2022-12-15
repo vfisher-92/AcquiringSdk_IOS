@@ -97,7 +97,7 @@ public final class PaymentController {
     private let threeDsService: IAcquiringThreeDSService
     private let paymentFactory: IPaymentFactory
     private let threeDSHandler: IThreeDSWebViewHandler
-    private let threeDSDeviceParamsProvider: ThreeDSDeviceParamsProvider
+    private let threeDSDeviceInfoProvider: IThreeDSDeviceInfoProvider
     // App based threeDS
     private let tdsController: ITDSController
 
@@ -125,7 +125,7 @@ public final class PaymentController {
         threeDsService: IAcquiringThreeDSService,
         paymentFactory: IPaymentFactory,
         threeDSHandler: IThreeDSWebViewHandler,
-        threeDSDeviceParamsProvider: ThreeDSDeviceParamsProvider,
+        threeDSDeviceInfoProvider: IThreeDSDeviceInfoProvider,
         tdsController: ITDSController,
         acquiringUISDK: AcquiringUISDK /* temporary*/,
         paymentDelegate: PaymentProcessDelegate? = nil
@@ -133,7 +133,7 @@ public final class PaymentController {
         self.threeDsService = threeDsService
         self.paymentFactory = paymentFactory
         self.threeDSHandler = threeDSHandler
-        self.threeDSDeviceParamsProvider = threeDSDeviceParamsProvider
+        self.threeDSDeviceInfoProvider = threeDSDeviceInfoProvider
         self.tdsController = tdsController
         self.acquiringUISDK = acquiringUISDK
         self.paymentDelegate = paymentDelegate ?? self
@@ -326,7 +326,7 @@ extension PaymentController: PaymentProcessDelegate {
     func payment(
         _ paymentProcess: PaymentProcess,
         needToCollect3DSData checking3DSURLData: Checking3DSURLData,
-        completion: @escaping (DeviceInfoParams) -> Void
+        completion: @escaping (ThreeDSDeviceInfo) -> Void
     ) {
         DispatchQueue.main.async {
             guard let webView = self.uiProvider?.hiddenWebViewToCollect3DSData(),
@@ -335,7 +335,7 @@ extension PaymentController: PaymentProcessDelegate {
             }
 
             webView.load(request)
-            completion(self.threeDSDeviceParamsProvider.deviceInfoParams)
+            completion(self.threeDSDeviceInfoProvider.deviceInfo)
         }
     }
 

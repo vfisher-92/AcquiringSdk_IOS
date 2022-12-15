@@ -25,7 +25,7 @@ public struct FinishAuthorizeData {
     let paymentSource: PaymentSourceData
     let infoEmail: String?
     let sendEmail: Bool?
-    let deviceInfo: DeviceInfoParams?
+    let deviceInfo: ThreeDSDeviceInfo?
     let ipAddress: String?
     let threeDSVersion: String?
     let source: String?
@@ -35,7 +35,7 @@ public struct FinishAuthorizeData {
         paymentId: String,
         paymentSource: PaymentSourceData,
         infoEmail: String? = nil,
-        deviceInfo: DeviceInfoParams? = nil,
+        deviceInfo: ThreeDSDeviceInfo? = nil,
         ipAddress: String? = nil,
         threeDSVersion: String? = nil,
         source: String? = nil,
@@ -61,14 +61,14 @@ public struct PaymentFinishRequestData {
 
     var sendEmail: Bool?
     var infoEmail: String?
-    var deviceInfo: DeviceInfoParams?
+    var deviceInfo: ThreeDSDeviceInfo?
     var ipAddress: String?
     var threeDSVersion: String?
 
     var source: String?
     var route: String?
 
-    public mutating func setDeviceInfo(info: DeviceInfoParams?) {
+    public mutating func setDeviceInfo(info: ThreeDSDeviceInfo?) {
         deviceInfo = info
     }
 

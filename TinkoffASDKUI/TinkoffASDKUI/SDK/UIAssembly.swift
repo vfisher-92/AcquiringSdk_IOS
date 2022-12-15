@@ -17,12 +17,9 @@
 //  limitations under the License.
 //
 
-import struct CoreGraphics.CGSize
 import TinkoffASDKCore
-import class UIKit.UIScreen
 
 struct UIAssembly {
-
     func paymentController(
         acquiringSDK: AcquiringSdk,
         acquiringUISDK: AcquiringUISDK,
@@ -35,7 +32,7 @@ struct UIAssembly {
                 ipProvider: ipProvider
             ),
             threeDSHandler: acquiringSDK.payment3DSHandler(),
-            threeDSDeviceParamsProvider: acquiringSDK.threeDSDeviceParamsProvider(screenSize: screenSize()),
+            threeDSDeviceInfoProvider: acquiringSDK.threeDSDeviceInfoProvider(),
             tdsController: acquiringUISDK.tdsController,
             acquiringUISDK: acquiringUISDK
         )
@@ -48,13 +45,6 @@ private extension UIAssembly {
             paymentsService: acquiringSDK,
             threeDsService: acquiringSDK,
             ipProvider: ipProvider
-        )
-    }
-
-    func screenSize() -> CGSize {
-        return CGSize(
-            width: UIScreen.main.bounds.width * UIScreen.main.scale,
-            height: UIScreen.main.bounds.height * UIScreen.main.scale
         )
     }
 }

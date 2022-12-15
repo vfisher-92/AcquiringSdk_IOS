@@ -1421,7 +1421,7 @@ public class AcquiringUISDK: NSObject {
                         )
                         // собираем информацию о девайсе
                         let screenSize = UIScreen.main.bounds.size
-                        let deviceInfo = DeviceInfoParams(
+                        let deviceInfo = ThreeDSDeviceInfo(
                             cresCallbackUrl: self.acquiringSdk.confirmation3DSTerminationV2URL().absoluteString,
                             languageId: self.acquiringSdk.languageKey?.rawValue ?? "ru",
                             screenWidth: Int(screenSize.width),

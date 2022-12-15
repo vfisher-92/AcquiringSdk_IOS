@@ -40,7 +40,7 @@ protocol PaymentProcessDelegate: AnyObject {
     func payment(
         _ paymentProcess: PaymentProcess,
         needToCollect3DSData checking3DSURLData: Checking3DSURLData,
-        completion: @escaping (DeviceInfoParams) -> Void
+        completion: @escaping (ThreeDSDeviceInfo) -> Void
     )
     func payment(
         _ paymentProcess: PaymentProcess,
