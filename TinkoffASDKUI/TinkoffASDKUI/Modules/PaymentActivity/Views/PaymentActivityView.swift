@@ -132,10 +132,3 @@ private extension CGFloat {
     static let processedHorizontalInset: CGFloat = 16
     static let processingHorizontalInset: CGFloat = 23.5
 }
-
-extension NSLayoutConstraint {
-    func with(priority: UILayoutPriority) -> NSLayoutConstraint {
-        self.priority = priority
-        return self
-    }
-}
