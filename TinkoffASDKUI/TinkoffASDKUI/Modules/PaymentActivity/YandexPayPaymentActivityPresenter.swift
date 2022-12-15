@@ -16,7 +16,7 @@ final class YandexPayPaymentActivityPresenter {
 
 extension YandexPayPaymentActivityPresenter: IPaymentActivityViewOutput {
     func viewDidLoad() {
-        view?.update(with: .loading, animated: false)
+        view?.update(with: .processing, animated: false)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             self.view?.update(with: .paid, animated: true)
@@ -67,9 +67,9 @@ extension YandexPayPaymentActivityPresenter: PaymentControllerDelegate {
 // MARK: - PaymentActivityViewState + YandexPayPaymentActivity States
 
 private extension PaymentActivityViewState {
-    static var loading: PaymentActivityViewState {
-        .loading(
-            Loading(
+    static var processing: PaymentActivityViewState {
+        .processing(
+            Processing(
                 title: Loc.CommonSheet.Processing.title,
                 description: Loc.CommonSheet.Processing.description
             )
@@ -77,8 +77,8 @@ private extension PaymentActivityViewState {
     }
 
     static var paid: PaymentActivityViewState {
-        .loaded(
-            Loaded(
+        .processed(
+            Processed(
                 image: Asset.TuiIcMedium.checkCirclePositive.image,
                 title: Loc.CommonSheet.Paid.title,
                 primaryButtonTitle: Loc.CommonSheet.Paid.primaryButton
@@ -87,8 +87,8 @@ private extension PaymentActivityViewState {
     }
 
     static var failed: PaymentActivityViewState {
-        .loaded(
-            Loaded(
+        .processed(
+            Processed(
                 image: Asset.TuiIcMedium.crossCircle.image,
                 title: Loc.YandexSheet.Failed.title,
                 description: Loc.YandexSheet.Failed.description,

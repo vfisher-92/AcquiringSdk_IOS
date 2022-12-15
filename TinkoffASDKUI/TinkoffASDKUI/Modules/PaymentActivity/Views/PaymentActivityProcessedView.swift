@@ -7,12 +7,12 @@
 
 import UIKit
 
-protocol PaymentActivityLoadedViewDelegate: AnyObject {
-    func paymentActivityLoadedViewDidTapPrimaryButton(_ view: PaymentActivityLoadedView)
+protocol PaymentActivityProcessedViewDelegate: AnyObject {
+    func paymentActivityProcessedViewDidTapPrimaryButton(_ view: PaymentActivityProcessedView)
 }
 
-final class PaymentActivityLoadedView: UIView {
-    weak var delegate: PaymentActivityLoadedViewDelegate?
+final class PaymentActivityProcessedView: UIView {
+    weak var delegate: PaymentActivityProcessedViewDelegate?
 
     // MARK: UI
 
@@ -46,7 +46,7 @@ final class PaymentActivityLoadedView: UIView {
         setupView()
     }
 
-    convenience init(delegate: PaymentActivityLoadedViewDelegate) {
+    convenience init(delegate: PaymentActivityProcessedViewDelegate) {
         self.init(frame: .zero)
         self.delegate = delegate
     }
@@ -58,7 +58,7 @@ final class PaymentActivityLoadedView: UIView {
 
     // MARK: View Updating
 
-    func update(with state: PaymentActivityViewState.Loaded) {
+    func update(with state: PaymentActivityViewState.Processed) {
         imageView.image = state.image
         titleLabel.text = state.title
         descriptionLabel.text = state.description
@@ -95,7 +95,7 @@ final class PaymentActivityLoadedView: UIView {
     // MARK: Events
 
     private func primaryButtonDidTap() {
-        delegate?.paymentActivityLoadedViewDidTapPrimaryButton(self)
+        delegate?.paymentActivityProcessedViewDidTapPrimaryButton(self)
     }
 }
 

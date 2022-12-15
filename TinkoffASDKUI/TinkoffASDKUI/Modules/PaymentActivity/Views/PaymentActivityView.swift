@@ -26,24 +26,24 @@ final class PaymentActivityView: UIView {
 
     // MARK: Subviews
 
-    private lazy var loadingView = PaymentActivityLoadingView()
-    private lazy var loadedView = PaymentActivityLoadedView(delegate: self)
+    private lazy var processingView = PaymentActivityProcessingView()
+    private lazy var processedView = PaymentActivityProcessedView(delegate: self)
 
     // MARK: Constraints
 
-    private lazy var loadingViewConstraints: [NSLayoutConstraint] = [
-        loadingView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: .commonTopInset),
-        loadingView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .loadingHorizontalInset),
-        loadingView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.loadingHorizontalInset),
-        loadingView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -.commonBottomInset)
+    private lazy var processingViewConstraints: [NSLayoutConstraint] = [
+        processingView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: .commonTopInset),
+        processingView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .processingHorizontalInset),
+        processingView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.processingHorizontalInset),
+        processingView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -.commonBottomInset)
             .with(priority: .fittingSizeLevel),
     ]
 
-    private lazy var loadedViewConstraints: [NSLayoutConstraint] = [
-        loadedView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: .commonTopInset),
-        loadedView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .loadedHorizontalInset),
-        loadedView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.loadedHorizontalInset),
-        loadedView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -.commonBottomInset)
+    private lazy var processedViewConstraints: [NSLayoutConstraint] = [
+        processedView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: .commonTopInset),
+        processedView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .processedHorizontalInset),
+        processedView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -.processedHorizontalInset),
+        processedView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -.commonBottomInset)
             .with(priority: .fittingSizeLevel),
     ]
 
@@ -73,22 +73,22 @@ final class PaymentActivityView: UIView {
 
         switch state {
         case .idle:
-            loadingView.isHidden = true
-            NSLayoutConstraint.deactivate(loadingViewConstraints)
-            loadedView.isHidden = true
-            NSLayoutConstraint.deactivate(loadedViewConstraints)
-        case let .loading(state):
-            loadingView.isHidden = false
-            NSLayoutConstraint.activate(loadingViewConstraints)
-            loadingView.update(with: state)
-            loadedView.isHidden = true
-            NSLayoutConstraint.deactivate(loadedViewConstraints)
-        case let .loaded(state):
-            loadingView.isHidden = true
-            NSLayoutConstraint.deactivate(loadingViewConstraints)
-            loadedView.isHidden = false
-            NSLayoutConstraint.activate(loadedViewConstraints)
-            loadedView.update(with: state)
+            processingView.isHidden = true
+            NSLayoutConstraint.deactivate(processingViewConstraints)
+            processedView.isHidden = true
+            NSLayoutConstraint.deactivate(processedViewConstraints)
+        case let .processing(state):
+            processingView.isHidden = false
+            NSLayoutConstraint.activate(processingViewConstraints)
+            processingView.update(with: state)
+            processedView.isHidden = true
+            NSLayoutConstraint.deactivate(processedViewConstraints)
+        case let .processed(state):
+            processingView.isHidden = true
+            NSLayoutConstraint.deactivate(processingViewConstraints)
+            processedView.isHidden = false
+            NSLayoutConstraint.activate(processedViewConstraints)
+            processedView.update(with: state)
         }
 
         delegate?.paymentActivityView(self, didChangeStateFrom: oldState, to: state)
@@ -97,17 +97,17 @@ final class PaymentActivityView: UIView {
     // MARK: Initial Configuration
 
     private func setupView() {
-        addSubview(loadingView)
-        loadingView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(loadedView)
-        loadedView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(processingView)
+        processingView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(processedView)
+        processedView.translatesAutoresizingMaskIntoConstraints = false
     }
 }
 
 // MARK: - PaymentActivityLoadedViewDelegate
 
-extension PaymentActivityView: PaymentActivityLoadedViewDelegate {
-    func paymentActivityLoadedViewDidTapPrimaryButton(_ view: PaymentActivityLoadedView) {
+extension PaymentActivityView: PaymentActivityProcessedViewDelegate {
+    func paymentActivityProcessedViewDidTapPrimaryButton(_ view: PaymentActivityProcessedView) {
         delegate?.paymentActivityView(self, didTapPrimaryButtonWithState: state)
     }
 }
@@ -129,8 +129,8 @@ extension PaymentActivityView {
 private extension CGFloat {
     static let commonTopInset: CGFloat = 24
     static let commonBottomInset: CGFloat = 24
-    static let loadedHorizontalInset: CGFloat = 16
-    static let loadingHorizontalInset: CGFloat = 23.5
+    static let processedHorizontalInset: CGFloat = 16
+    static let processingHorizontalInset: CGFloat = 23.5
 }
 
 extension NSLayoutConstraint {

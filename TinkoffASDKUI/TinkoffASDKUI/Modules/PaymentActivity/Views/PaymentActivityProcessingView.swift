@@ -1,5 +1,5 @@
 //
-//  PaymentActivityLoadingView.swift
+//  PaymentActivityProcessingView.swift
 //  TinkoffASDKUI
 //
 //  Created by r.akhmadeev on 14.12.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class PaymentActivityLoadingView: UIView {
+final class PaymentActivityProcessingView: UIView {
     // MARK: Subviews
 
     private lazy var activityIndicator = ActivityIndicatorView(style: .xlYellow)
@@ -41,7 +41,7 @@ final class PaymentActivityLoadingView: UIView {
 
     // MARK: View Updating
 
-    func update(with state: PaymentActivityViewState.Loading) {
+    func update(with state: PaymentActivityViewState.Processing) {
         titleLabel.text = state.title
         descriptionLabel.text = state.description
     }
@@ -66,5 +66,4 @@ final class PaymentActivityLoadingView: UIView {
 private extension CGFloat {
     static let indicatorBottomInset: CGFloat = 20
     static let titleBottomInset: CGFloat = 8
-    static let stackHorizontalInset: CGFloat = 23.5
 }

@@ -8,7 +8,7 @@
 import Foundation
 
 enum PaymentActivityViewState: Equatable {
-    struct Loaded: Equatable {
+    struct Processed: Equatable {
         let image: UIImage
         let title: String
         let description: String?
@@ -27,12 +27,12 @@ enum PaymentActivityViewState: Equatable {
         }
     }
 
-    struct Loading: Equatable {
+    struct Processing: Equatable {
         let title: String
         let description: String
     }
 
     case idle
-    case loading(Loading)
-    case loaded(Loaded)
+    case processing(Processing)
+    case processed(Processed)
 }
