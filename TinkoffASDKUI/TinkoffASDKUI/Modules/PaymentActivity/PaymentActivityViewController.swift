@@ -90,4 +90,25 @@ extension PaymentActivityViewController {
     func pullableContainerWasClosed() {
         presenter.viewWasClosed()
     }
+
+    func pullableContainerShouldDismissOnDownDragging() -> Bool {
+        paymentActivityView.state.isDismissingAllowed
+    }
+
+    func pullableContainerShouldDismissOnDimmingViewTap() -> Bool {
+        paymentActivityView.state.isDismissingAllowed
+    }
+}
+
+// MARK: - PaymentActivityViewState + Helpers
+
+private extension PaymentActivityViewState {
+    var isDismissingAllowed: Bool {
+        switch self {
+        case .idle, .processed:
+            return true
+        case .processing:
+            return false
+        }
+    }
 }
