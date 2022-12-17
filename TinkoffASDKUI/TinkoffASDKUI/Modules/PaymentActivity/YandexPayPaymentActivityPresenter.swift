@@ -17,10 +17,6 @@ final class YandexPayPaymentActivityPresenter {
 extension YandexPayPaymentActivityPresenter: IPaymentActivityViewOutput {
     func viewDidLoad() {
         view?.update(with: .processing, animated: false)
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            self.view?.update(with: .paid, animated: true)
-        }
     }
 
     func primaryButtonTapped() {
@@ -92,7 +88,7 @@ private extension PaymentActivityViewState {
                 image: Asset.TuiIcMedium.crossCircle.image,
                 title: Loc.YandexSheet.Failed.title,
                 description: Loc.YandexSheet.Failed.description,
-                primaryButtonTitle: Loc.YandexSheet.Failed.description
+                primaryButtonTitle: Loc.YandexSheet.Failed.primaryButton
             )
         )
     }
