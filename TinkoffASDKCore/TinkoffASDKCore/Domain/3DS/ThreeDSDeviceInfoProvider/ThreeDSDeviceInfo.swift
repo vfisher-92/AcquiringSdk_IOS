@@ -41,6 +41,7 @@ public struct ThreeDSDeviceInfo {
     let sdkUiType: String
 
     public init(
+        threeDSCompInd: String = "Y",
         cresCallbackUrl: String,
         languageId: String = "ru",
         screenWidth: Int,
@@ -53,7 +54,7 @@ public struct ThreeDSDeviceInfo {
         sdkMaxTimeout: String? = nil,
         sdkEncData: String? = nil
     ) {
-        threeDSCompInd = "Y"
+        self.threeDSCompInd = threeDSCompInd
         javaEnabled = "true"
         self.colorDepth = colorDepth
         language = languageId

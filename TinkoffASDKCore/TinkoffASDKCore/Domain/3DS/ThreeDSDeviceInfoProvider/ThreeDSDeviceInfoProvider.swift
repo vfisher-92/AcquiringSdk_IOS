@@ -21,19 +21,16 @@ import Foundation
 import class UIKit.UIScreen
 
 public protocol IThreeDSDeviceInfoProvider {
-    var deviceInfo: ThreeDSDeviceInfo { get }
+    func createDeviceInfo(threeDSCompInd: String) -> ThreeDSDeviceInfo
+}
+
+public extension IThreeDSDeviceInfoProvider {
+    var deviceInfo: ThreeDSDeviceInfo {
+        createDeviceInfo(threeDSCompInd: "Y")
+    }
 }
 
 final class ThreeDSDeviceInfoProvider: IThreeDSDeviceInfoProvider {
-    var deviceInfo: ThreeDSDeviceInfo {
-        ThreeDSDeviceInfo(
-            cresCallbackUrl: urlBuilder.url(ofType: .confirmation3DSTerminationV2URL).absoluteString,
-            languageId: (languageProvider.language ?? .ru).rawValue,
-            screenWidth: Int(UIScreen.main.bounds.width * UIScreen.main.scale),
-            screenHeight: Int(UIScreen.main.bounds.height * UIScreen.main.scale)
-        )
-    }
-
     private let languageProvider: ILanguageProvider
     private let urlBuilder: IThreeDSURLBuilder
 
@@ -43,5 +40,15 @@ final class ThreeDSDeviceInfoProvider: IThreeDSDeviceInfoProvider {
     ) {
         self.languageProvider = languageProvider
         self.urlBuilder = urlBuilder
+    }
+
+    func createDeviceInfo(threeDSCompInd: String) -> ThreeDSDeviceInfo {
+        ThreeDSDeviceInfo(
+            threeDSCompInd: threeDSCompInd,
+            cresCallbackUrl: urlBuilder.url(ofType: .confirmation3DSTerminationV2URL).absoluteString,
+            languageId: (languageProvider.language ?? .ru).rawValue,
+            screenWidth: Int(UIScreen.main.bounds.width * UIScreen.main.scale),
+            screenHeight: Int(UIScreen.main.bounds.height * UIScreen.main.scale)
+        )
     }
 }

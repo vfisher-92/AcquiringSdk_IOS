@@ -24,7 +24,7 @@ extension YandexPaySDKFacade: IYandexPaySDKInitializable {
 
 // MARK: - IYandexPaySDKButtonBuilder
 
-extension YandexPaySDKFacade: IYandexPaySDKButtonBuilder {
+extension YandexPaySDKFacade: IYandexPaySDKButtonFactory {
     func createButton(
         configuration: YandexPaySDK.YandexPayButtonConfiguration,
         asyncDelegate: YandexPaySDK.YandexPayButtonAsyncDelegate

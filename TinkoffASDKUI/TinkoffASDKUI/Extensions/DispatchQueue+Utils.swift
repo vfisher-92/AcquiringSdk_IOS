@@ -1,8 +1,8 @@
 //
 //  DispatchQueue+Utils.swift
-//  TinkoffASDKYandexPay
+//  TinkoffASDKUI
 //
-//  Created by r.akhmadeev on 09.12.2022.
+//  Created by r.akhmadeev on 19.12.2022.
 //
 
 import Foundation

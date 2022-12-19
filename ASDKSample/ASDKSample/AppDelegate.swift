@@ -29,24 +29,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        let merchant = YandexPaySDKMerchant(
-            id: "bbb9c171-2fab-45e6-b1f8-6212980aa9bb",
-            name: "Calooking",
-            url: "http://calooking.com"
-        )
-
-        let configuration = YandexPaySDKConfiguration(
-            environment: .sandbox,
-            merchant: merchant,
-            locale: .ru
-        )
-
-        do {
-            try YandexPaySDKApi.initialize(configuration: configuration)
-        } catch {
-            assertionFailure("YandexPay initialization failed with error: \(error)")
-        }
-
         return true
     }
 
@@ -55,20 +37,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         continue userActivity: NSUserActivity,
         restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
     ) -> Bool {
-        YandexPaySDKApi.instance.applicationDidReceiveUserActivity(userActivity)
+        YandexPayApplicationEventsReceiver.applicationDidReceiveUserActivity(userActivity)
         return true
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        YandexPaySDKApi.instance.applicationDidReceiveOpen(url, sourceApplication: options[.sourceApplication] as? String)
+        YandexPayApplicationEventsReceiver.applicationDidReceiveOpen(url, sourceApplication: options[.sourceApplication] as? String)
         return true
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
-        YandexPaySDKApi.instance.applicationWillEnterForeground()
+        YandexPayApplicationEventsReceiver.applicationWillEnterForeground()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        YandexPaySDKApi.instance.applicationDidBecomeActive()
+        YandexPayApplicationEventsReceiver.applicationDidBecomeActive()
     }
 }

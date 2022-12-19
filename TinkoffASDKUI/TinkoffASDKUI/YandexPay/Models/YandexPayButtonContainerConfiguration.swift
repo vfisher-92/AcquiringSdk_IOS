@@ -6,10 +6,9 @@
 //
 
 import Foundation
-import YandexPaySDK
 
 /// Цвет кнопки `YandexPay`
-public enum YandexPayButtonAppearance {
+public enum YandexPayButtonContainerAppearance {
     /// Светлый цвет для темного фона
     case light
     /// Темный цвет для светлого фона
@@ -17,17 +16,17 @@ public enum YandexPayButtonAppearance {
 }
 
 /// Тема для кнопки `YandexPay`
-public struct YandexPayButtonTheme {
+public struct YandexPayButtonContainerTheme {
     /// Цвет кнопки `YandexPay`
-    public let appearance: YandexPayButtonAppearance
+    public var appearance: YandexPayButtonContainerAppearance
     /// Автоматически обновлять цвет при изменении темы
-    public let dynamic: Bool
+    public var dynamic: Bool
 
     /// Создание новой темы для кнопки `YandexPay`
     /// - Parameters:
     ///   - appearance: Цвет кнопки `YandexPay`
     ///   - dynamic: Автоматически обновлять цвет при изменении темы
-    public init(appearance: YandexPayButtonAppearance, dynamic: Bool = true) {
+    public init(appearance: YandexPayButtonContainerAppearance, dynamic: Bool = true) {
         self.appearance = appearance
         self.dynamic = dynamic
     }
@@ -36,49 +35,16 @@ public struct YandexPayButtonTheme {
 /// Конфигурация контейнера кнопки `YandexPay`
 public struct YandexPayButtonContainerConfiguration {
     /// Тема для кнопки `YandexPay`
-    public let theme: YandexPayButtonTheme
+    public var theme: YandexPayButtonContainerTheme
     /// Радиус скругления кнопки. При `nil` используется значение по умолчанию
-    public let cornerRadius: CGFloat?
+    public var cornerRadius: CGFloat?
 
     /// Создание конфигурации контейнера кнопки `YandexPay`
     /// - Parameters:
     ///   - theme: Тема для кнопки `YandexPay`
     ///   - cornerRadius: Радиус скругления кнопки. При `nil` используется значение по умолчанию
-    public init(theme: YandexPayButtonTheme, cornerRadius: CGFloat? = nil) {
+    public init(theme: YandexPayButtonContainerTheme, cornerRadius: CGFloat? = nil) {
         self.theme = theme
         self.cornerRadius = cornerRadius
-    }
-}
-
-// MARK: - YandexPayButtonConfiguration + Mapping
-
-extension YandexPayButtonContainerConfiguration {
-    var mappedToYandexPaySDK: YandexPaySDK.YandexPayButtonConfiguration {
-        YandexPaySDK.YandexPayButtonConfiguration(theme: theme.mappedToYandexPaySDK)
-    }
-}
-
-// MARK: - YandexPayButtonConfiguration.Theme + Mapping
-
-extension YandexPayButtonTheme {
-    var mappedToYandexPaySDK: YandexPaySDK.YandexPayButtonTheme {
-        if #available(iOS 13, *) {
-            return YandexPaySDK.YandexPayButtonTheme(appearance: appearance.mappedToYandexPaySDK, dynamic: dynamic)
-        } else {
-            return YandexPaySDK.YandexPayButtonTheme(appearance: appearance.mappedToYandexPaySDK)
-        }
-    }
-}
-
-// MARK: - YandexPayButtonConfiguration.Appearance + Mapping
-
-extension YandexPayButtonAppearance {
-    var mappedToYandexPaySDK: YandexPaySDK.YandexPayButtonApperance {
-        switch self {
-        case .light:
-            return .light
-        case .dark:
-            return .dark
-        }
     }
 }

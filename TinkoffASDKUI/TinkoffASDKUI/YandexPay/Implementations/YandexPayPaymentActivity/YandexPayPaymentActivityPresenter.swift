@@ -9,7 +9,34 @@ import Foundation
 import TinkoffASDKCore
 
 final class YandexPayPaymentActivityPresenter {
+    // MARK: Dependencies
+
     weak var view: IPaymentActivityViewInput?
+    private weak var output: IYandexPayPaymentActivityOutput?
+    private let paymentController: IPaymentController
+    private let paymentControllerUIProvider: PaymentControllerUIProvider
+    private let paymentOptions: PaymentOptions
+    private let base64Token: String
+
+    // MARK: State
+
+    private var paymentResult: YandexPayPaymentResult = .cancelled
+
+    // MARK: Init
+
+    init(
+        paymentController: IPaymentController,
+        paymentControllerUIProvider: PaymentControllerUIProvider,
+        paymentOptions: PaymentOptions,
+        base64Token: String,
+        output: IYandexPayPaymentActivityOutput
+    ) {
+        self.paymentController = paymentController
+        self.paymentControllerUIProvider = paymentControllerUIProvider
+        self.paymentOptions = paymentOptions
+        self.base64Token = base64Token
+        self.output = output
+    }
 }
 
 // MARK: - IPaymentActivityViewOutput
@@ -17,6 +44,11 @@ final class YandexPayPaymentActivityPresenter {
 extension YandexPayPaymentActivityPresenter: IPaymentActivityViewOutput {
     func viewDidLoad() {
         view?.update(with: .processing, animated: false)
+
+        paymentController.performInitPayment(
+            paymentOptions: paymentOptions,
+            paymentSource: .yandexPay(base64Token: base64Token)
+        )
     }
 
     func primaryButtonTapped() {
@@ -24,7 +56,7 @@ extension YandexPayPaymentActivityPresenter: IPaymentActivityViewOutput {
     }
 
     func viewWasClosed() {
-        print("")
+        output?.yandexPayPaymentActivity(completedWith: paymentResult)
     }
 }
 
@@ -38,6 +70,12 @@ extension YandexPayPaymentActivityPresenter: PaymentControllerDelegate {
         cardId: String?,
         rebillId: String?
     ) {
+        let paymentInfo = YandexPayPaymentResult.PaymentInfo(
+            paymentOptions: paymentOptions,
+            paymentId: state.paymentId,
+            rebillId: rebillId
+        )
+        paymentResult = .succeeded(paymentInfo)
         view?.update(with: .paid, animated: true)
     }
 
@@ -47,6 +85,7 @@ extension YandexPayPaymentActivityPresenter: PaymentControllerDelegate {
         cardId: String?,
         rebillId: String?
     ) {
+        paymentResult = .cancelled
         view?.close()
     }
 
@@ -56,6 +95,7 @@ extension YandexPayPaymentActivityPresenter: PaymentControllerDelegate {
         cardId: String?,
         rebillId: String?
     ) {
+        paymentResult = .failed(error)
         view?.update(with: .failed, animated: true)
     }
 }

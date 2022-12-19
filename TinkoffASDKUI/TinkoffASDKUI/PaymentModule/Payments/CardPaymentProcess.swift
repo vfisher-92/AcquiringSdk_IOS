@@ -37,9 +37,9 @@ final class CardPaymentProcess: PaymentProcess {
     private var customerEmail: String? {
         switch paymentFlow {
         case let .full(paymentOptions):
-            return paymentOptions.customerOptions.email
+            return paymentOptions.customerOptions?.email
         case let .finish(_, customerOptions):
-            return customerOptions.email
+            return customerOptions?.email
         }
     }
 
@@ -65,7 +65,7 @@ final class CardPaymentProcess: PaymentProcess {
     func start() {
         switch paymentFlow {
         case let .full(paymentOptions):
-            initPayment(data: paymentOptions.convertToPaymentInitData())
+            initPayment(data: .data(with: paymentOptions))
         case let .finish(paymentId, _):
             self.paymentId = paymentId
             check3DSVersion(data: Check3DSVersionData(paymentId: paymentId, paymentSource: paymentSource))
@@ -140,18 +140,9 @@ private extension CardPaymentProcess {
                 infoEmail: customerEmail
             )
             finishAuthorize(data: data)
-        case .yandexPay:
-            let data = FinishAuthorizeData(
-                paymentId: payload.paymentId,
-                paymentSource: paymentSource,
-                infoEmail: customerEmail,
-                deviceInfo: threeDSDeviceInfoProvider.deviceInfo
-            )
-
-            finishAuthorize(data: data)
-        case .parentPayment:
+        case .parentPayment, .yandexPay:
             // Log error
-            assertionFailure("Only cardNumber, savedCard or paymentData PaymentSourceData available")
+            assertionFailure("Only cardNumber, savedCard or applePay PaymentSourceData available")
         }
     }
 

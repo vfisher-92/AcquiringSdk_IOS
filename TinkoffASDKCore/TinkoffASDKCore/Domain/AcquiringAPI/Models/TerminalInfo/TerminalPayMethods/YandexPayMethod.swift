@@ -17,6 +17,19 @@ public struct YandexPayMethod {
     public let merchantOrigin: String
     /// ID продавца для инициализации YandexPay (`YandexPaySDKMerchant.id`)
     public let showcaseId: String
+
+    /// Инициализация данных для оплаты с помощью YandexPay
+    public init(
+        merchantId: String,
+        merchantName: String,
+        merchantOrigin: String,
+        showcaseId: String
+    ) {
+        self.merchantId = merchantId
+        self.merchantName = merchantName
+        self.merchantOrigin = merchantOrigin
+        self.showcaseId = showcaseId
+    }
 }
 
 // MARK: - YandexPayMethod + Decodable

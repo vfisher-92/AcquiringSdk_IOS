@@ -6,47 +6,41 @@
 //
 
 import TinkoffASDKCore
+import TinkoffASDKUI
 import UIKit
 import YandexPaySDK
-
-public protocol IYandexPayButtonContainer: UIView {
-    var theme: YandexPayButtonTheme { get }
-    func setLoaderVisible(_ visible: Bool, animated: Bool)
-    func reloadPersonalizationData(completion: @escaping (Error?) -> Void)
-    func setTheme(_ theme: YandexPayButtonTheme, animated: Bool)
-}
 
 final class YandexPayButtonContainer: UIView {
     // MARK: Dependencies
 
     private var configuration: YandexPayButtonContainerConfiguration
-    private let buttonBuilder: IYandexPaySDKButtonBuilder
-    private let controllerBuilder: IYandexPayButtonContainerControllerBuilder
-    private weak var delegate: IYandexPayButtonContainerDelegate?
+    private let sdkButtonFactory: IYandexPaySDKButtonFactory
+    private let controllerFactory: IYandexPayButtonContainerControllerFactory
+    private weak var delegate: YandexPayButtonContainerDelegate?
 
     // MARK: Lazy Dependencies
 
-    private lazy var yandexPayButton: YandexPayButton = buttonBuilder.createButton(
-        configuration: configuration.mappedToYandexPaySDK,
+    private lazy var yandexPayButton: YandexPayButton = sdkButtonFactory.createButton(
+        configuration: .from(configuration),
         asyncDelegate: self
     )
 
-    private lazy var controller: IYandexPayController = controllerBuilder.build(with: self)
+    private lazy var controller: IYandexPayButtonContainerController = controllerFactory.create(with: self)
 
     // MARK: Init
 
     init(
         configuration: YandexPayButtonContainerConfiguration,
-        buttonBuilder: IYandexPaySDKButtonBuilder,
-        controllerBuilder: IYandexPayButtonContainerControllerBuilder,
-        delegate: IYandexPayButtonContainerDelegate
+        sdkButtonFactory: IYandexPaySDKButtonFactory,
+        controllerFactory: IYandexPayButtonContainerControllerFactory,
+        delegate: YandexPayButtonContainerDelegate
     ) {
         self.configuration = configuration
-        self.buttonBuilder = buttonBuilder
-        self.controllerBuilder = controllerBuilder
+        self.sdkButtonFactory = sdkButtonFactory
+        self.controllerFactory = controllerFactory
         self.delegate = delegate
         super.init(frame: .zero)
-        initialSetup()
+        setupView()
     }
 
     @available(*, unavailable)
@@ -54,9 +48,9 @@ final class YandexPayButtonContainer: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: Initial Setup
+    // MARK: Initial Configuration
 
-    private func initialSetup() {
+    private func setupView() {
         addSubview(yandexPayButton)
         yandexPayButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -75,7 +69,7 @@ final class YandexPayButtonContainer: UIView {
 // MARK: - IYandexPayButtonContainer
 
 extension YandexPayButtonContainer: IYandexPayButtonContainer {
-    var theme: YandexPayButtonTheme {
+    var theme: YandexPayButtonContainerTheme {
         configuration.theme
     }
 
@@ -87,62 +81,54 @@ extension YandexPayButtonContainer: IYandexPayButtonContainer {
         yandexPayButton.reloadPersonalizationData(completion: completion)
     }
 
-    func setTheme(_ theme: YandexPayButtonTheme, animated: Bool) {
-        configuration = configuration.copyReplacing(theme: theme)
-        yandexPayButton.setTheme(theme.mappedToYandexPaySDK, animated: animated)
+    func setTheme(_ theme: YandexPayButtonContainerTheme, animated: Bool) {
+        configuration.theme = theme
+        yandexPayButton.setTheme(.from(theme), animated: animated)
     }
 }
 
 // MARK: - YandexPayButtonAsyncDelegate
 
 extension YandexPayButtonContainer: YandexPayButtonAsyncDelegate {
-    func yandexPayButtonDidRequestViewControllerForPresentation(_ button: YandexPaySDK.YandexPayButton) -> UIViewController? {
+    func yandexPayButtonDidRequestViewControllerForPresentation(_ button: YandexPayButton) -> UIViewController? {
         delegate?.yandexPayButtonContainerDidRequestViewControllerForPresentation(self)
     }
 
     func yandexPayButtonDidRequestPaymentSheet(
-        _ button: YandexPaySDK.YandexPayButton,
-        completion: @escaping (YandexPaySDK.YPPaymentSheet?) -> Void
+        _ button: YandexPayButton,
+        completion: @escaping (YPPaymentSheet?) -> Void
     ) {
         controller.requestPaymentSheet(completion: completion)
     }
 
     func yandexPayButton(
-        _ button: YandexPaySDK.YandexPayButton,
-        didCompletePaymentWithResult result: YandexPaySDK.YPPaymentResult
+        _ button: YandexPayButton,
+        didCompletePaymentWithResult result: YPPaymentResult
     ) {
         controller.handlePaymentResult(result)
     }
 }
 
-// MARK: - IYandexPayButtonContainerControllerDelegate
+// MARK: - YandexPayButtonContainerControllerDelegate
 
-extension YandexPayButtonContainer: IYandexPayControllerDelegate {
+extension YandexPayButtonContainer: YandexPayButtonContainerControllerDelegate {
+    func yandexPayController(
+        _ controller: IYandexPayButtonContainerController,
+        didRequestPaymentSheet completion: @escaping (YandexPayPaymentSheet?) -> Void
+    ) {
+        delegate?.yandexPayButtonContainer(self, didRequestPaymentSheet: completion)
+    }
+
     func yandexPayControllerDidRequestViewControllerForPresentation(
-        _ controller: IYandexPayController
+        _ controller: IYandexPayButtonContainerController
     ) -> UIViewController? {
         delegate?.yandexPayButtonContainerDidRequestViewControllerForPresentation(self)
     }
 
     func yandexPayController(
-        _ controller: IYandexPayController,
-        didRequestPaymentData completion: @escaping (TinkoffASDKCore.PaymentInitData?) -> Void
-    ) {
-        delegate?.yandexPayButtonContainerDidRequestInitData(self, completion: completion)
-    }
-
-    func yandexPayController(
-        _ controller: YandexPayController,
-        didCompleteWithResult result: YandexPayButtonContainerResult
+        _ controller: YandexPayButtonContainerController,
+        didCompleteWithResult result: YandexPayPaymentResult
     ) {
         delegate?.yandexPayButtonContainer(self, didCompletePaymentWithResult: result)
-    }
-}
-
-// MARK: - YandexPayButtonContainerConfiguration + Utils
-
-private extension YandexPayButtonContainerConfiguration {
-    func copyReplacing(theme: YandexPayButtonTheme) -> YandexPayButtonContainerConfiguration {
-        YandexPayButtonContainerConfiguration(theme: theme, cornerRadius: cornerRadius)
     }
 }

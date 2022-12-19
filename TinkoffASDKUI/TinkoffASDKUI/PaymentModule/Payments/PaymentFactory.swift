@@ -20,7 +20,6 @@
 import TinkoffASDKCore
 
 protocol IPaymentFactory {
-
     func createPayment(
         paymentSource: PaymentSourceData,
         paymentFlow: PaymentFlow,
@@ -52,7 +51,7 @@ struct PaymentFactory: IPaymentFactory {
         paymentDelegate: PaymentProcessDelegate
     ) -> PaymentProcess? {
         switch paymentSource {
-        case .cardNumber, .savedCard, .applePay, .yandexPay:
+        case .cardNumber, .savedCard, .applePay:
             return CardPaymentProcess(
                 paymentsService: paymentsService,
                 threeDsService: threeDsService,
@@ -62,6 +61,20 @@ struct PaymentFactory: IPaymentFactory {
                 paymentFlow: paymentFlow,
                 delegate: paymentDelegate
             )
+        case let .yandexPay(base64Token):
+            switch paymentFlow {
+            case let .full(paymentOptions):
+                return YandexPayPaymentProcess(
+                    paymentOptions: paymentOptions,
+                    base64Token: base64Token,
+                    paymentService: paymentsService,
+                    threeDSService: threeDsService,
+                    threeDSDeviceInfoProvider: threeDSDeviceInfoProvider,
+                    delegate: paymentDelegate
+                )
+            case .finish:
+                return nil
+            }
         case .parentPayment:
             return ChargePaymentProcess(
                 paymentsService: paymentsService,

@@ -17,16 +17,16 @@
 //  limitations under the License.
 //
 
-import TinkoffASDKYandexPay
 import UIKit
 
 final class YPButtonContainerView: UIView {
-    let button: IYandexPayButtonContainer
+    private let contentView = UIView()
 
-    init(_ button: IYandexPayButtonContainer) {
-        self.button = button
-        super.init(frame: .zero)
-        setup()
+    // MARK: Init
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
     }
 
     @available(*, unavailable)
@@ -34,17 +34,27 @@ final class YPButtonContainerView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setup() {
-        addSubview(button)
-        button.translatesAutoresizingMaskIntoConstraints = false
+    // MARK: Updating
+
+    func set(button: UIView) {
+        contentView.subviews.forEach { $0.removeFromSuperview() }
+        contentView.addSubview(button)
+        button.makeEqualToSuperview()
+    }
+
+    // MARK: Initial Configuration
+
+    private func setupView() {
+        addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            button.centerXAnchor.constraint(equalTo: centerXAnchor),
-            button.centerYAnchor.constraint(equalTo: centerYAnchor),
-            button.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 16),
-            button.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -16),
-            button.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: 8),
-            button.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -8),
+            contentView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            contentView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            contentView.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 16),
+            contentView.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -16),
+            contentView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: 8),
+            contentView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -8),
         ])
     }
 }

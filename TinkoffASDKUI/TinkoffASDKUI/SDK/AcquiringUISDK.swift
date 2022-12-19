@@ -182,14 +182,26 @@ public class AcquiringUISDK: NSObject {
     private let shouldUseAppBasedThreeDSFlow = false
 
     private weak var logger: LoggerDelegate?
-    private let uiAssembly: UIAssembly
+    private let paymentControllerAssembly: PaymentControllerAssembly
+    private let yandexPayButtonContainerFactoryProvider: IYandexPayButtonContainerFactoryProvider
 
-    public init(
+    // MARK: Init
+
+    public convenience init(
         configuration: AcquiringSdkConfiguration,
         style: Style = DefaultStyle()
     ) throws {
-        acquiringSdk = try AcquiringSdk(configuration: configuration)
-        uiAssembly = UIAssembly()
+        let coreSDK = try AcquiringSdk(configuration: configuration)
+        self.init(coreSDK: coreSDK, configuration: configuration, style: style)
+    }
+
+    init(
+        coreSDK: AcquiringSdk,
+        configuration: AcquiringSdkConfiguration,
+        style: Style = DefaultStyle()
+    ) {
+        acquiringSdk = coreSDK
+        paymentControllerAssembly = PaymentControllerAssembly(coreSDK: coreSDK, sdkConfiguration: configuration)
         self.style = style
         sbpAssembly = SBPAssembly(coreSDK: acquiringSdk, style: style)
         tinkoffPayAssembly = TinkoffPayAssembly(
@@ -207,6 +219,15 @@ public class AcquiringUISDK: NSObject {
         )
         logger = configuration.logger
         cardListAssembly = CardListAssembly(primaryButtonStyle: style.bigButtonStyle)
+
+        yandexPayButtonContainerFactoryProvider = YandexPayButtonContainerFactoryProvider(
+            flowAssembly: YandexPayPaymentFlowAssembly(
+                yandexPayActivityAssebmly: YandexPayPaymentActivityAssembly(
+                    paymentControllerAssembly: paymentControllerAssembly
+                )
+            ),
+            methodLoader: YandexPayMethodProvider(terminalService: coreSDK)
+        )
     }
 
     /// Вызывается кода пользователь привязывает карту.
@@ -1939,11 +1960,7 @@ extension AcquiringUISDK: PKPaymentAuthorizationViewControllerDelegate {
         delegate: PaymentControllerDelegate,
         dataSource: PaymentControllerDataSource? = nil
     ) -> PaymentController {
-        let paymentController = uiAssembly.paymentController(
-            acquiringSDK: acquiringSdk,
-            acquiringUISDK: self,
-            ipProvider: acquiringSdk.ipAddressProvider
-        )
+        let paymentController = paymentControllerAssembly.paymentController()
         paymentController.uiProvider = uiProvider
         paymentController.delegate = delegate
         paymentController.dataSource = dataSource
@@ -2049,4 +2066,18 @@ extension AcquiringUISDK: WKNavigationDelegate {
             } // termURL.hasSuffix confirmation3DSTerminationURL
         } // document.baseURI
     } // func webView didFinish
+}
+
+public extension AcquiringUISDK {
+    func yandexPayButtonContainerFactory(
+        with configuration: YandexPaySDKConfiguration,
+        initializer: IYandexPayButtonContainerFactoryInitializer,
+        completion: @escaping (Result<IYandexPayButtonContainerFactory, Error>) -> Void
+    ) {
+        yandexPayButtonContainerFactoryProvider.yandexPayButtonContainerFactory(
+            with: configuration,
+            initializer: initializer,
+            completion: completion
+        )
+    }
 }

@@ -23,7 +23,7 @@ struct GetTerminalPayMethods: AcquiringRequest {
 // MARK: - String + Helpers
 
 private extension String {
-    static let paySourceKey = "Paysource"
+    static let paySourceKey = "PaySource"
     static let paySourceValue = "SDK"
 
     // TODO: MIC-7135 Add correct way to handle query parameters in NetworkClient
