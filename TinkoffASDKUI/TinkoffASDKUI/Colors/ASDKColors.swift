@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct ASDKColors {
+public struct ASDKColors {
 
     static var tinkoffYellow: UIColor {
         UIColor(hex: "#FFDD2D") ?? .clear
@@ -68,9 +68,9 @@ extension ASDKColors {
 
     // MARK: - Background
 
-    struct Background {
+    public struct Background {
 
-        static var base: UIColor.Dynamic {
+        public static var base: UIColor.Dynamic {
             UIColor.Dynamic(
                 light: ASDKColors.n14,
                 dark: ASDKColors.n15

@@ -22,6 +22,12 @@ import UIKit
 final class YPButtonContainerView: UIView {
     private let contentView = UIView()
 
+    enum Style {
+        case big
+        case standard
+        case small
+    }
+
     // MARK: Init
 
     override init(frame: CGRect) {
@@ -36,10 +42,39 @@ final class YPButtonContainerView: UIView {
 
     // MARK: Updating
 
-    func set(button: UIView) {
+    func set(button: UIView, style: Style) {
         contentView.subviews.forEach { $0.removeFromSuperview() }
         contentView.addSubview(button)
-        button.makeEqualToSuperview()
+        button.translatesAutoresizingMaskIntoConstraints = false
+
+        switch style {
+        case .big:
+            NSLayoutConstraint.activate([
+                button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+                button.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+                button.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: .horizontalInsets),
+                button.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -.horizontalInsets),
+                button.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor, constant: .verticalInsets),
+                button.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -.verticalInsets),
+            ])
+        case .standard:
+            NSLayoutConstraint.activate([
+                button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+                button.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+                button.width(constant: 250),
+                button.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor, constant: .verticalInsets),
+                button.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -.verticalInsets),
+            ])
+        case .small:
+            NSLayoutConstraint.activate([
+                button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+                button.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+                button.width(constant: 150),
+                button.height(constant: 40),
+                button.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor, constant: .verticalInsets),
+                button.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -.verticalInsets),
+            ])
+        }
     }
 
     // MARK: Initial Configuration
@@ -47,7 +82,7 @@ final class YPButtonContainerView: UIView {
     private func setupView() {
         addSubview(contentView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
-
+        contentView.makeEqualToSuperview()
         NSLayoutConstraint.activate([
             contentView.centerXAnchor.constraint(equalTo: centerXAnchor),
             contentView.centerYAnchor.constraint(equalTo: centerYAnchor),

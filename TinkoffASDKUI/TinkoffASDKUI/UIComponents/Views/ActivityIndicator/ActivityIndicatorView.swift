@@ -8,7 +8,7 @@
 import UIKit
 
 /// Индикатор активности
-final class ActivityIndicatorView: UIView, Stylable, ShadowAvailable {
+public final class ActivityIndicatorView: UIView, Stylable, ShadowAvailable {
 
     /// Флаг активности анимации
     private(set) var isAnimating = false
@@ -26,18 +26,18 @@ final class ActivityIndicatorView: UIView, Stylable, ShadowAvailable {
 
     // MARK: - Lifecycle
 
-    init(style: Style = Style()) {
+    public init(style: Style = Style()) {
         super.init(frame: .zero)
 
         accessibilityIdentifier = String(describing: ActivityIndicatorView.self)
         apply(style: style)
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
 
-    override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
         let padding = style?.padding ?? Constants.Layout.padding
         let originSize = (padding - size.height) / 2
@@ -51,7 +51,7 @@ final class ActivityIndicatorView: UIView, Stylable, ShadowAvailable {
         circle.position = CGPoint(x: bounds.midX, y: bounds.midY)
     }
 
-    override func didMoveToWindow() {
+    override public func didMoveToWindow() {
         super.didMoveToWindow()
         if window == nil {
             stopAnimation(animated: false)
@@ -60,7 +60,7 @@ final class ActivityIndicatorView: UIView, Stylable, ShadowAvailable {
         }
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
@@ -71,7 +71,7 @@ final class ActivityIndicatorView: UIView, Stylable, ShadowAvailable {
 
     // MARK: - Layout
 
-    override var intrinsicContentSize: CGSize {
+    override public var intrinsicContentSize: CGSize {
         size
     }
 
@@ -185,7 +185,7 @@ final class ActivityIndicatorView: UIView, Stylable, ShadowAvailable {
 
     // MARK: - Style
 
-    struct Style {
+    public struct Style {
         var backgroundColor: UIColor
         var lineColor: UIColor
         var cornerRadius: CGFloat?
@@ -195,7 +195,7 @@ final class ActivityIndicatorView: UIView, Stylable, ShadowAvailable {
         let shadow: ShadowStyle?
         let lineCap: CAShapeLayerLineCap
 
-        init(
+        public init(
             backgroundColor: UIColor = .clear,
             lineColor: UIColor = .black,
             cornerRadius: CGFloat? = nil,
@@ -219,7 +219,7 @@ final class ActivityIndicatorView: UIView, Stylable, ShadowAvailable {
 
 // MARK: - Default Styles
 
-extension ActivityIndicatorView.Style {
+public extension ActivityIndicatorView.Style {
     static var standart: ActivityIndicatorView.Style {
         ActivityIndicatorView.Style()
     }

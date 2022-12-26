@@ -18,7 +18,7 @@ protocol ShadowAvailable: AnyObject {
 }
 
 /// Структура стиля тени
-struct ShadowStyle: Equatable {
+public struct ShadowStyle: Equatable {
     /// Радиус
     var radius: CGFloat
     /// Цвет
@@ -31,7 +31,7 @@ struct ShadowStyle: Equatable {
     let offsetY: CGFloat
 
     /// Инициализация
-    init(radius: CGFloat, color: UIColor, opacity: Float, offsetX: CGFloat = 0, offsetY: CGFloat = 0) {
+    public init(radius: CGFloat, color: UIColor, opacity: Float, offsetX: CGFloat = 0, offsetY: CGFloat = 0) {
         self.color = color
         self.radius = radius
         self.opacity = opacity

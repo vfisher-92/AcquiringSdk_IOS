@@ -7,13 +7,13 @@
 
 import UIKit
 
-extension UIColor {
+public extension UIColor {
 
     struct Dynamic {
         let light: UIColor
         let dark: UIColor
 
-        var color: UIColor {
+        public var color: UIColor {
             UIColor.dynamicColor(dynamic: self)
         }
 

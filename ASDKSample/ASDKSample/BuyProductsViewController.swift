@@ -43,7 +43,9 @@ class BuyProductsViewController: UIViewController {
         /// сгенерировать url для оплаты
         case paySbpUrl
         /// Оплатить с помощью встроенной кнопки `YandexPay`
-        case yandexPay
+        case yandexPayBig
+        case yandexPayStandard
+        case yandexPaySmall
     }
 
     var products: [Product] = []
@@ -58,18 +60,12 @@ class BuyProductsViewController: UIViewController {
 
     @IBOutlet var tableView: UITableView!
     @IBOutlet var buttonAddToCart: UIBarButtonItem!
-    private lazy var yandexPayButtonContainerView = YPButtonContainerView()
+    private lazy var yandexPayButtonContainerViewBig = YPButtonContainerView()
+    private lazy var yandexPayButtonContainerViewStandard = YPButtonContainerView()
+    private lazy var yandexPayButtonContainerViewSmall = YPButtonContainerView()
 
     private var cardRebillIds: [PaymentCard]?
-    private var tableViewCells: [TableViewCellType] = [
-        .products,
-        .pay,
-        .payAndSaveAsParent,
-        .payRequrent,
-        .payApplePay,
-        .paySbpQrCode,
-        .paySbpUrl,
-    ]
+    private var tableViewCells: [TableViewCellType] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -96,22 +92,56 @@ class BuyProductsViewController: UIViewController {
     }
 
     private func setupYandexPayButton() {
+        tableView.backgroundColor = ASDKColors.Background.base.color
+        let container = UIView()
+        container.backgroundColor = ASDKColors.Background.base.color
+
+        view.addSubview(container)
+        container.makeEqualToSuperview()
+
+        let indicator = ActivityIndicatorView(style: .xlYellow)
+
+        container.addSubview(indicator)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            indicator.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            indicator.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+        ])
+
         let configuration = YandexPaySDKConfiguration(environment: .sandbox, locale: .system)
 
         sdk.yandexPayButtonContainerFactory(with: configuration) { [weak self] result in
             guard let self = self else { return }
 
+            UIView.animate(
+                withDuration: 0.3,
+                delay: .zero,
+                options: .curveEaseInOut,
+                animations: { container.alpha = 0 },
+                completion: { _ in container.removeFromSuperview() }
+            )
+
             switch result {
             case let .success(factory):
-                let button = factory.createButtonContainer(
-                    with: YandexPayButtonContainerConfiguration(theme: YandexPayButtonContainerTheme(appearance: .dark), cornerRadius: 8),
-                    delegate: self
+                let configuration = YandexPayButtonContainerConfiguration(theme: YandexPayButtonContainerTheme(appearance: .dark), cornerRadius: 8)
+
+                self.yandexPayButtonContainerViewBig.set(
+                    button: factory.createButtonContainer(with: configuration, delegate: self),
+                    style: .big
                 )
-                self.yandexPayButtonContainerView.set(button: button)
-                self.tableViewCells.append(.yandexPay)
+                self.yandexPayButtonContainerViewStandard.set(
+                    button: factory.createButtonContainer(with: configuration, delegate: self),
+                    style: .standard
+                )
+                self.yandexPayButtonContainerViewSmall.set(
+                    button: factory.createButtonContainer(with: configuration, delegate: self),
+                    style: .small
+                )
+                self.tableViewCells = [.yandexPayBig, .yandexPayStandard, .yandexPaySmall, .payApplePay]
                 self.tableView.reloadData()
             case .failure:
-                break
+                self.tableViewCells = [.payApplePay]
+                self.tableView.reloadData()
             }
         }
     }
@@ -434,6 +464,7 @@ extension BuyProductsViewController: UITableViewDataSource {
         return result
     }
 
+    // swiftlint:disable:next function_body_length
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch tableViewCells[indexPath.section] {
         case .products:
@@ -517,7 +548,8 @@ extension BuyProductsViewController: UITableViewDataSource {
                 cell.button.backgroundColor = .clear
                 cell.button.setImage(Asset.buttonApplePay.image, for: .normal)
                 cell.button.isEnabled = sdk.canMakePaymentsApplePay(with: paymentApplePayConfiguration)
-
+                cell.backgroundColor = .clear
+                cell.contentView.backgroundColor = .clear
                 cell.onButtonTouch = { [weak self] in
                     self?.payByApplePay()
                 }
@@ -550,11 +582,23 @@ extension BuyProductsViewController: UITableViewDataSource {
 
                 return cell
             }
-        case .yandexPay:
+        case .yandexPayBig:
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ContainerTableViewCell.reusableId) as? ContainerTableViewCell else {
                 fatalError()
             }
-            cell.setContent(yandexPayButtonContainerView)
+            cell.setContent(yandexPayButtonContainerViewBig)
+            return cell
+        case .yandexPayStandard:
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ContainerTableViewCell.reusableId) as? ContainerTableViewCell else {
+                fatalError()
+            }
+            cell.setContent(yandexPayButtonContainerViewStandard)
+            return cell
+        case .yandexPaySmall:
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ContainerTableViewCell.reusableId) as? ContainerTableViewCell else {
+                fatalError()
+            }
+            cell.setContent(yandexPayButtonContainerViewSmall)
             return cell
         }
 
@@ -580,7 +624,11 @@ extension BuyProductsViewController: UITableViewDataSource {
 
         case .paySbpUrl, .paySbpQrCode:
             return Loc.Title.payBySBP
-        case .yandexPay:
+        case .yandexPayBig:
+            return Loc.Title.yandexPay
+        case .yandexPayStandard:
+            return Loc.Title.yandexPay
+        case .yandexPaySmall:
             return Loc.Title.yandexPay
         }
     }
@@ -631,7 +679,7 @@ extension BuyProductsViewController: UITableViewDataSource {
             }
 
             return "оплата недоступна"
-        case .yandexPay:
+        case .yandexPayBig, .yandexPayStandard, .yandexPaySmall:
             return nil
         }
     }
