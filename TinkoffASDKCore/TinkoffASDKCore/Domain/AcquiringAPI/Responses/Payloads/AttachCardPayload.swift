@@ -36,13 +36,13 @@ public struct AttachCardPayload: Decodable {
 
     public let status: PaymentStatus
     public let requestKey: String
-    public let cardId: String?
+    public let cardId: String
     public let attachCardStatus: AttachCardStatus
 
     public init(
         status: PaymentStatus,
         requestKey: String,
-        cardId: String?,
+        cardId: String,
         attachCardStatus: AttachCardStatus
     ) {
         self.status = status
@@ -55,7 +55,7 @@ public struct AttachCardPayload: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         status = try container.decodeIfPresent(PaymentStatus.self, forKey: .status) ?? .unknown
         requestKey = try container.decode(String.self, forKey: .requestKey)
-        cardId = try container.decodeIfPresent(String.self, forKey: .cardId)
+        cardId = try container.decode(String.self, forKey: .cardId)
 
         switch status {
         case .checking3ds, .hold3ds:

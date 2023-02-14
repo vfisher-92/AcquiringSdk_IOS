@@ -455,6 +455,23 @@ public final class AcquiringSdk: NSObject {
         )
     }
 
+    // MARK: - AddCard State
+
+    /// Возвращает статус привязки карты
+    ///
+    /// - Parameters:
+    ///   - data: `GetAddCardStateData`
+    ///   - completion: результат операции `GetAddCardStatePayload` в случае успешного получения статуса карты и `Error` - ошибка.
+    /// - Returns: `Cancellable`
+    @discardableResult
+    public func getAddCardState(
+        data: GetAddCardStateData,
+        completion: @escaping (_ result: Result<GetAddCardStatePayload, Error>) -> Void
+    ) -> Cancellable {
+        let request = acquiringRequests.getAddCardState(data: data)
+        return acquiringAPI.performRequest(request, completion: completion)
+    }
+
     // MARK: Submit Random Amount
 
     /// Подтверждение карты путем блокировки случайной суммы
